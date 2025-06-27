@@ -6,948 +6,7 @@
     <title>Sri Manakula Vinayagar Engineering College VR Tour</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/aframe/1.4.2/aframe.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Montserrat:wght@300;400;500;600;700&display=swap');
-        
-        :root {
-            --primary-color: rgba(54, 66, 155, 1);
-            --primary-light: rgba(74, 86, 175, 1);
-            --primary-dark: rgba(34, 46, 135, 1);
-            --accent-color: rgba(255, 183, 0, 1);
-            --accent-light: rgba(255, 207, 51, 1);
-            --text-light: rgba(255, 255, 255, 0.95);
-            --text-dark: rgba(40, 40, 40, 1);
-            --gradient-primary: linear-gradient(135deg, rgba(39, 50, 135, 1), rgba(54, 66, 155, 1), rgba(87, 100, 195, 1));
-            --gradient-gold: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
-            --box-shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.15);
-            --box-shadow-heavy: 0 15px 50px rgba(0, 0, 0, 0.3);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            scroll-behavior: smooth;
-        }
-
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Montserrat', sans-serif;
-            overflow-x: hidden;
-            background-color: #f0f2ff;
-            color: var(--text-dark);
-        }
-
-        /* Enhanced animations */
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 100% 50%; }
-        }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Welcome Screen with enhanced visuals */
-        #welcome-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--gradient-primary);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite alternate;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: var(--text-light);
-            z-index: 2000;
-            transition: opacity 0.8s ease-in-out, transform 0.8s ease;
-            overflow: hidden;
-        }
-
-        #welcome-screen::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('https://res.cloudinary.com/dugxrvrs5/image/upload/v1743753190/20250404_131710_587_formphotoeditor.com_wjfmhk.jpg');
-            background-size: cover;
-            background-position: center;
-            opacity: 0.15;
-            filter: blur(8px);
-        }
-
-        #welcome-screen::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at center, rgba(54, 66, 155, 0.4) 0%, rgba(32, 40, 115, 0.85) 70%);
-        }
-
-        .welcome-content {
-            position: relative;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            max-width: 1200px;
-            padding: 0 20px;
-            text-align: center;
-        }
-
-        #welcome-logo {
-            width: 180px;
-            height: 180px;
-            margin-bottom: 30px;
-            animation: fadeInUp 1.2s ease;
-            border-radius: 50%;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.2);
-            position: relative;
-            z-index: 5;
-        }
-
-        #welcome-title {
-            font-size: 3.5em;
-            margin-bottom: 20px;
-            font-family: 'Playfair Display', serif;
-            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-            animation: fadeInUp 1.5s ease;
-            font-weight: 800;
-            background: var(--gradient-gold);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            letter-spacing: 1px;
-            line-height: 1.2;
-        }
-
-        #welcome-subtitle {
-            font-size: 1.6em;
-            margin-bottom: 45px;
-            font-weight: 300;
-            max-width: 800px;
-            line-height: 1.6;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-            animation: fadeInUp 1.8s ease;
-            letter-spacing: 0.5px;
-        }
-
-        #enter-button {
-            padding: 18px 50px;
-            font-size: 1.4em;
-            background: var(--gradient-gold);
-            border: none;
-            color: var(--primary-dark);
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            animation: fadeInUp 2s ease, pulse 3s infinite 2s;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.2),
-                        0 0 20px rgba(255, 183, 0, 0.4);
-        }
-
-        #enter-button:hover {
-            transform: translateY(-7px) scale(1.05);
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3),
-                        0 0 30px rgba(255, 183, 0, 0.6);
-        }
-
-        /* Enhanced Home Page */
-        #home-page {
-            display: none;
-            position: relative;
-            width: 100%;
-            background: linear-gradient(rgba(5, 10, 35, 0.7), rgba(5, 10, 35, 0.7)), 
-                      url('https://res.cloudinary.com/dugxrvrs5/image/upload/v1743753190/20250404_131710_587_formphotoeditor.com_wjfmhk.jpg') center/cover fixed no-repeat;
-            overflow-y: auto;
-            z-index: 1000;
-            min-height: 100vh;
-            opacity: 1;
-            transition: opacity 0.8s ease;
-        }
-
-        .home-overlay {
-            background-color: rgba(0, 0, 0, 0.5);
-            width: 100%;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .header {
-            text-align: center;
-            padding: 40px 20px 30px;
-            color: white;
-            width: 100%;
-            position: sticky;
-            top: 0;
-            background: linear-gradient(180deg, rgba(20, 30, 90, 0.95) 0%, rgba(54, 66, 155, 0.95) 100%);
-            z-index: 100;
-            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.25);
-        }
-
-        .header-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            position: relative;
-        }
-
-        .header h1 {
-            font-size: 3em;
-            margin-bottom: 15px;
-            font-family: 'Playfair Display', serif;
-            text-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
-            font-weight: 700;
-            background: var(--gradient-gold);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            display: inline-block;
-        }
-
-        .header p {
-            font-size: 1.2em;
-            max-width: 800px;
-            margin: 0 auto;
-            font-style: italic;
-            font-weight: 300;
-            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-        }
-
-        /* Enhanced Navigation Menu */
-        .nav-menu-container {
-            position: sticky;
-            top: 120px;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.95);
-            z-index: 99;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
-            padding: 10px 0;
-        }
-
-        .nav-menu {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 15px 0;
-            gap: 15px;
-            justify-content: center;
-        }
-
-        .nav-item {
-            padding: 15px 10px;
-            background-color: transparent;
-            color: var(--primary-dark);
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 1em;
-            margin: 0 5px;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            font-weight: 600;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .nav-item i {
-            font-size: 1.4em;
-            margin-bottom: 8px;
-        }
-
-        .nav-item:hover {
-            color: white;
-            background: linear-gradient(45deg, var(--primary-color), var(--primary-light));
-            transform: translateY(-3px);
-            box-shadow: 0 7px 15px rgba(54, 66, 155, 0.3);
-        }
-
-        .nav-item.active {
-            background: linear-gradient(45deg, var(--primary-color), var(--primary-light));
-            color: white;
-            font-weight: 700;
-            box-shadow: 0 10px 20px rgba(54, 66, 155, 0.4);
-            transform: translateY(-3px);
-        }
-
-        /* Enhanced Sub-Navigation */
-        .sub-nav-container {
-            position: relative;
-            width: 100%;
-            display: none;
-            background: rgba(240, 240, 255, 0.95);
-            transition: all 0.3s ease;
-            padding: 10px 0;
-            border-top: 1px solid rgba(54, 66, 155, 0.2);
-            border-bottom: 1px solid rgba(54, 66, 155, 0.2);
-        }
-        
-        .sub-nav-container.active {
-            display: block;
-            animation: fadeInUp 0.4s ease;
-        }
-        
-        .sub-nav-menu {
-            display: flex;
-            flex-wrap: wrap;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0;
-            justify-content: center;
-            gap: 10px;
-        }
-        
-        .sub-nav-item {
-            padding: 8px 15px;
-            background-color: rgba(255, 255, 255, 0.8);
-            color: var(--primary-dark);
-            border: none;
-            border-radius: 30px;
-            cursor: pointer;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.9em;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        
-        .sub-nav-item i {
-            margin-right: 8px;
-            font-size: 1.1em;
-        }
-        
-        .sub-nav-item:hover {
-            background-color: rgba(54, 66, 155, 0.1);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-        }
-        
-        .sub-nav-item.active {
-            background: linear-gradient(45deg, var(--primary-color), var(--primary-light));
-            color: white;
-            box-shadow: 0 4px 10px rgba(54, 66, 155, 0.3);
-        }
-
-        /* Enhanced Sections */
-        .section {
-            width: 90%;
-            max-width: 1200px;
-            margin: 60px auto;
-            scroll-margin-top: 200px;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.5s ease, transform 0.5s ease;
-        }
-
-        .section.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .section-header {
-            position: relative;
-            background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
-            color: white;
-            padding: 25px 30px;
-            font-size: 2em;
-            text-align: center;
-            font-family: 'Playfair Display', serif;
-            font-weight: 700;
-            border-radius: 15px 15px 0 0;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-        }
-
-        .section-content {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 0 0 15px 15px;
-            padding: 35px;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
-            position: relative;
-            z-index: 2;
-        }
-        
-        /* Enhanced Department Styles */
-        .department-content {
-            display: none;
-        }
-        
-        .department-content.active {
-            display: block;
-            animation: fadeIn 0.5s ease;
-        }
-        
-        .department-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.6em;
-            margin-bottom: 25px;
-            color: var(--primary-dark);
-            font-weight: 600;
-            text-align: center;
-            padding-bottom: 15px;
-            border-bottom: 2px solid rgba(54, 66, 155, 0.2);
-        }
-
-        /* Enhanced Image Grid */
-        .image-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
-        }
-
-        .image-item {
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-            transition: all 0.4s ease;
-            cursor: pointer;
-            position: relative;
-            aspect-ratio: 4/3;
-            transform: translateZ(0);
-            opacity: 0;
-            transform: translateY(20px);
-        }
-
-        .image-item.loaded {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .image-item:hover {
-            transform: translateY(-15px);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
-        }
-
-        .image-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.5s ease;
-            background-color: #eee;
-        }
-
-        .image-item:hover img {
-            transform: scale(1.1);
-        }
-
-        .image-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to bottom, 
-                rgba(0, 0, 0, 0) 0%, 
-                rgba(0, 0, 0, 0.4) 50%, 
-                rgba(0, 0, 0, 0.8) 100%);
-            opacity: 0.7;
-            transition: opacity 0.4s ease;
-        }
-
-        .image-item:hover .image-overlay {
-            opacity: 0.01;
-            
-        }
-
-        .image-caption {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            padding: 20px;
-            color: white;
-            text-align: center;
-            font-size: 1.3em;
-            transition: all 0.4s ease;
-            font-weight: 600;
-            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-        }
-
-        .image-item:hover .image-caption {
-            transform: translateY(-10px);
-        }
-        
-        .view-indicator {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.9);
-            color: var(--primary-dark);
-            padding: 10px;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            transform: translateY(20px);
-            opacity: 0;
-            transition: all 0.4s ease;
-        }
-        
-        .image-item:hover .view-indicator {
-            transform: translateY(0);
-            opacity: 1;
-        }
-        
-        .view-indicator i {
-            font-size: 1.5em;
-        }
-
-        /* Enhanced Controls */
-        .back-to-home {
-            position: fixed;
-            top: 30px;
-            left: 30px;
-            padding: 15px 30px;
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
-            color: white;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            z-index: 1001;
-            font-family: 'Montserrat', sans-serif;
-            display: none;
-            font-weight: 600;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-            transition: all 0.4s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .back-to-home:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
-        }
-        
-        .back-to-home i {
-            margin-right: 8px;
-        }
-
-        .media-info {
-            position: fixed;
-            top: 30px;
-            left: 50%;
-            transform: translateX(-50%) translateY(-100px);
-            background: rgba(255, 255, 255, 0.95);
-            color: var(--primary-dark);
-            padding: 15px 30px;
-            border-radius: 50px;
-            z-index: 998;
-            opacity: 0;
-            transition: all 0.5s ease;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 600;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            font-size: 1.1em;
-            text-align: center;
-            min-width: 300px;
-        }
-
-        .media-info.visible {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-        
-        .media-info strong {
-            color: var(--primary-color);
-            display: block;
-            font-size: 1.2em;
-            margin-top: 5px;
-        }
-
-        #control-panel {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: none;
-            gap: 25px;
-            z-index: 999;
-        }
-
-        .control-btn {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.95);
-            color: var(--primary-color);
-            border: none;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.4s ease;
-            font-weight: bold;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 1.5em;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        .control-btn:hover {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
-            color: white;
-            transform: translateY(-10px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        .control-btn.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-       
-        #vr-toggle {
-            position: relative;
-            font-size: 1.2em;
-            font-weight: 600;
-        }
-       
-        #vr-toggle::after {
-            content: '';
-            position: absolute;
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-            background-color: var(--accent-color);
-            top: 10px;
-            right: 10px;
-            transition: all 0.4s ease;
-            box-shadow: 0 0 10px rgba(255, 183, 0, 0.7);
-        }
-       
-        #vr-toggle.active::after {
-            background-color: #4CAF50;
-            box-shadow: 0 0 10px rgba(76, 175, 80, 0.7);
-        }
-
-        #vr-container {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            display: none;
-            background-color: #000;
-        }
-        
-        /* Enhanced Loading */
-        #loading-message {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            font-size: 1.8em;
-            text-align: center;
-            z-index: 1002;
-            display: none;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 25px 50px;
-            border-radius: 50px;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 500;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            min-width: 300px;
-            opacity: 1;
-            transition: opacity 0.5s ease;
-        }
-        
-        .loading-spinner {
-            display: inline-block;
-            width: 50px;
-            height: 50px;
-            margin-top: 20px;
-            border: 5px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: var(--accent-color);
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        /* Enhanced Navigation Controls */
-        .vr-navigation-controls {
-            position: fixed;
-            right: 30px;
-            top: 50%;
-            transform: translateY(-50%);
-            display: none;
-            flex-direction: column;
-            gap: 15px;
-            z-index: 999;
-        }
-        
-        .vr-nav-btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.85);
-            color: var(--primary-color);
-            border: none;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 1.2em;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        .vr-nav-btn:hover {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
-            color: white;
-            transform: scale(1.1);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-        }
-
-        .back-to-top {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
-            color: white;
-            border: none;
-            font-size: 1.5em;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-            opacity: 0;
-            transform: translateY(100px);
-            transition: all 0.4s ease;
-            z-index: 1000;
-        }
-
-        .back-to-top.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .back-to-top:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(54, 66, 155, 0.4);
-        }
-
-        /* Image placeholder */
-        .image-placeholder {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: absolute;
-            top: 0;
-            left: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .image-placeholder i {
-            font-size: 2em;
-            color: #999;
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 1024px) {
-            #welcome-title {
-                font-size: 2.8em;
-            }
-            
-            .header h1 {
-                font-size: 2.5em;
-            }
-            
-            .image-grid {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            }
-            
-            .control-btn {
-                width: 60px;
-                height: 60px;
-            }
-            
-            .vr-nav-btn {
-                width: 45px;
-                height: 45px;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .image-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 15px;
-            }
-
-            .nav-menu {
-                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-                gap: 10px;
-            }
-
-            .nav-item {
-                padding: 10px 8px;
-                font-size: 0.85em;
-                margin: 0 3px;
-            }
-            
-            .nav-item i {
-                font-size: 1.2em;
-                margin-bottom: 5px;
-            }
-
-            #welcome-title {
-                font-size: 2.2em;
-            }
-
-            #welcome-subtitle {
-                font-size: 1.2em;
-            }
-            
-            .header h1 {
-                font-size: 1.8em;
-            }
-            
-            .section-header {
-                font-size: 1.6em;
-            }
-            
-            .nav-menu-container {
-                top: 100px;
-            }
-            
-            .section {
-                scroll-margin-top: 180px;
-                margin: 40px auto;
-            }
-            
-            .control-btn {
-                width: 55px;
-                height: 55px;
-                font-size: 1.3em;
-            }
-            
-            .back-to-home {
-                top: 20px;
-                left: 20px;
-                padding: 12px 20px;
-                font-size: 0.9em;
-            }
-            
-            .back-to-top {
-                width: 50px;
-                height: 50px;
-                bottom: 20px;
-                right: 20px;
-            }
-            
-            .vr-navigation-controls {
-                right: 15px;
-            }
-            
-            .vr-nav-btn {
-                width: 40px;
-                height: 40px;
-                font-size: 1em;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .image-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
-            }
-
-            #welcome-title {
-                font-size: 1.8em;
-            }
-            
-            #welcome-subtitle {
-                font-size: 1.1em;
-            }
-            
-            #enter-button {
-                padding: 15px 30px;
-                font-size: 1.2em;
-            }
-            
-            .section-content {
-                padding: 20px;
-            }
-            
-            .header p {
-                font-size: 1em;
-            }
-            
-            .image-caption {
-                font-size: 1.1em;
-            }
-            
-            .control-btn {
-                width: 50px;
-                height: 50px;
-                gap: 15px;
-            }
-            
-            .vr-navigation-controls {
-                right: 10px;
-            }
-            
-            .vr-nav-btn {
-                width: 36px;
-                height: 36px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <!-- Loading Message -->
@@ -1020,1318 +79,297 @@
             </div>
             
             <!-- Campus Section -->
-  <section id="campus" class="section">
-    <div class="section-header">Campus</div>
-    <div class="section-content">
-        <div class="image-grid">
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315076/entrance_jgbfdn.jpg" data-category="campus">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315076/entrance_jgbfdn.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315076/entrance_jgbfdn.jpg" alt="Entrance" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Entrance</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315079/kovil_xj0psx.jpg" data-category="campus">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315079/kovil_xj0psx.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315079/kovil_xj0psx.jpg" alt="Temple" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Temple</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315074/central_library_oxukdy.jpg" data-category="campus">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315074/central_library_oxukdy.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315074/central_library_oxukdy.jpg" alt="Central Library" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Central Library</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315090/tennis_court_uowj3i.jpg" data-category="campus">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315090/tennis_court_uowj3i.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315090/tennis_court_uowj3i.jpg" alt="Tennis Court" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Tennis Court</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315071/basket_ball_court_nl7pfu.jpg" data-category="campus">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315071/basket_ball_court_nl7pfu.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315071/basket_ball_court_nl7pfu.jpg" alt="Basketball Court" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Basketball Court</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315069/auditorium_mwstj7.jpg" data-category="campus">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315069/auditorium_mwstj7.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315069/auditorium_mwstj7.jpg" alt="Auditorium" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Auditorium</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315093/view_l1rqgi.jpg" data-category="campus">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315093/view_l1rqgi.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315093/view_l1rqgi.jpg" alt="View" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">View</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            
-            
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315087/old_admin_block_oqo2tw.jpg" data-category="campus">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315087/old_admin_block_oqo2tw.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315087/old_admin_block_oqo2tw.jpg" alt="Old Admin Block" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Old Admin Block</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-        </div>
-    </div>
-</section>
-<!-- Engineering Section with Department Tabs -->
-<section id="engineering" class="section">
-    <div class="section-header">Engineering</div>
-    <div class="sub-nav-container" id="engineering-departments">
-        <div class="sub-nav-menu">
-            <a href="#eng-ece" class="sub-nav-item active" data-target="ece-content"><i class="fas fa-microchip"></i>ECE</a>
-            <a href="#eng-cse" class="sub-nav-item " data-target="cse-content"><i class="fas fa-laptop-code"></i>CSE</a>
-            <a href="#eng-eee" class="sub-nav-item" data-target="eee-content"><i class="fas fa-bolt"></i>EEE</a>
-            <a href="#eng-it" class="sub-nav-item" data-target="it-content"><i class="fas fa-desktop"></i>IT</a>
-            <a href="#eng-mech" class="sub-nav-item" data-target="mechanical-content"><i class="fas fa-cogs"></i>Mechanical</a>
-            <a href="#eng-civil" class="sub-nav-item" data-target="civil-content"><i class="fas fa-hard-hat"></i>Civil</a>
-            <a href="#eng-bme" class="sub-nav-item" data-target="bme-content"><i class="fas fa-stethoscope"></i>BME</a>
-            <a href="#eng-mechatronics" class="sub-nav-item" data-target="mechatronics-content"><i class="fas fa-robot"></i>Mechatronics</a>
-            <a href="#eng-ice" class="sub-nav-item" data-target="ice-content"><i class="fas fa-tools"></i>ICE</a>
-            <a href="#eng-aids" class="sub-nav-item" data-target="aids-content"><i class="fas fa-brain"></i>AI&DS</a>
-            <a href="#eng-csbs" class="sub-nav-item" data-target="csbs-content"><i class="fas fa-database"></i>CSEBS</a>
-            <a href="#eng-cce" class="sub-nav-item" data-target="cce-content"><i class="fas fa-network-wired"></i>CCE</a>
-        </div>
-    </div>
-    <div class="section-content">
-        <!-- ECE Department Content -->
-<div id="ece-content" class="department-content active">
-    <h3 class="department-title">Electronics and Communication Engineering</h3>
-    <div class="image-grid">
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314611/Linear_integrated_circuits_gpehil.jpg" data-category="engineering-ece">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314611/Linear_integrated_circuits_gpehil.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314611/Linear_integrated_circuits_gpehil.jpg" alt="Linear Integrated Circuits" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Linear Integrated Circuits</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314607/Electronic_devices_and_integrated_circuits_mm9jau.jpg" data-category="engineering-ece">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314607/Electronic_devices_and_integrated_circuits_mm9jau.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314607/Electronic_devices_and_integrated_circuits_mm9jau.jpg" alt="Electronic Devices and Integrated Circuits" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Electronic Devices and Integrated Circuits</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314605/Computer_Centre_lghjhx.jpg" data-category="engineering-ece">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314605/Computer_Centre_lghjhx.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314605/Computer_Centre_lghjhx.jpg" alt="Computer Centre" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Computer Centre</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750400372/classrooms_gqo3fh.jpg" data-category="engineering-csbs">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750400372/classrooms_gqo3fh.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750400372/classrooms_gqo3fh.jpg" alt="Classrooms" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Classroom</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314614/Seminar_hall_izmnum.jpg" data-category="engineering-ece">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314614/Seminar_hall_izmnum.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314614/Seminar_hall_izmnum.jpg" alt="Seminar Hall" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Seminar Hall</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-    </div>
-</div>
+            <section id="campus" class="section">
+                <div class="section-header">Campus</div>
+                <div class="section-content">
+                    <div class="image-grid">
+                        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315076/entrance_jgbfdn.jpg" data-category="campus">
+                            <div class="image-placeholder"><i class="fas fa-image"></i></div>
+                            <picture>
+                                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315076/entrance_jgbfdn.webp" type="image/webp">
+                                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315076/entrance_jgbfdn.jpg" alt="Entrance" class="lazy-image" loading="lazy" decoding="async">
+                            </picture>
+                            <div class="image-overlay"></div>
+                            <div class="image-caption">Entrance</div>
+                            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
+                        </div>
+                        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315079/kovil_xj0psx.jpg" data-category="campus">
+                            <div class="image-placeholder"><i class="fas fa-image"></i></div>
+                            <picture>
+                                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315079/kovil_xj0psx.webp" type="image/webp">
+                                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315079/kovil_xj0psx.jpg" alt="Temple" class="lazy-image" loading="lazy" decoding="async">
+                            </picture>
+                            <div class="image-overlay"></div>
+                            <div class="image-caption">Temple</div>
+                            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
+                        </div>
+                        
+                        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315074/central_library_oxukdy.jpg" data-category="campus">
+                            <div class="image-placeholder"><i class="fas fa-image"></i></div>
+                            <picture>
+                                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315074/central_library_oxukdy.webp" type="image/webp">
+                                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315074/central_library_oxukdy.jpg" alt="Central Library" class="lazy-image" loading="lazy" decoding="async">
+                            </picture>
+                            <div class="image-overlay"></div>
+                            <div class="image-caption">Central Library</div>
+                            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
+                        </div>
+                        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315090/tennis_court_uowj3i.jpg" data-category="campus">
+                            <div class="image-placeholder"><i class="fas fa-image"></i></div>
+                            <picture>
+                                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315090/tennis_court_uowj3i.webp" type="image/webp">
+                                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315090/tennis_court_uowj3i.jpg" alt="Tennis Court" class="lazy-image" loading="lazy" decoding="async">
+                            </picture>
+                            <div class="image-overlay"></div>
+                            <div class="image-caption">Tennis Court</div>
+                            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
+                        </div>
+                        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315071/basket_ball_court_nl7pfu.jpg" data-category="campus">
+                            <div class="image-placeholder"><i class="fas fa-image"></i></div>
+                            <picture>
+                                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315071/basket_ball_court_nl7pfu.webp" type="image/webp">
+                                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315071/basket_ball_court_nl7pfu.jpg" alt="Basketball Court" class="lazy-image" loading="lazy" decoding="async">
+                            </picture>
+                            <div class="image-overlay"></div>
+                            <div class="image-caption">Basketball Court</div>
+                            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
+                        </div>
+                        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315069/auditorium_mwstj7.jpg" data-category="campus">
+                            <div class="image-placeholder"><i class="fas fa-image"></i></div>
+                            <picture>
+                                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315069/auditorium_mwstj7.webp" type="image/webp">
+                                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315069/auditorium_mwstj7.jpg" alt="Auditorium" class="lazy-image" loading="lazy" decoding="async">
+                            </picture>
+                            <div class="image-overlay"></div>
+                            <div class="image-caption">Auditorium</div>
+                            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
+                        </div>
+                        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315093/view_l1rqgi.jpg" data-category="campus">
+                            <div class="image-placeholder"><i class="fas fa-image"></i></div>
+                            <picture>
+                                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315093/view_l1rqgi.webp" type="image/webp">
+                                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315093/view_l1rqgi.jpg" alt="View" class="lazy-image" loading="lazy" decoding="async">
+                            </picture>
+                            <div class="image-overlay"></div>
+                            <div class="image-caption">View</div>
+                            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
+                        </div>
+                        
+                        
+                        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315087/old_admin_block_oqo2tw.jpg" data-category="campus">
+                            <div class="image-placeholder"><i class="fas fa-image"></i></div>
+                            <picture>
+                                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315087/old_admin_block_oqo2tw.webp" type="image/webp">
+                                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315087/old_admin_block_oqo2tw.jpg" alt="Old Admin Block" class="lazy-image" loading="lazy" decoding="async">
+                            </picture>
+                            <div class="image-overlay"></div>
+                            <div class="image-caption">Old Admin Block</div>
+                            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-<!-- AIDS Department Content -->
-<div id="aids-content" class="department-content ">
-    <h3 class="department-title">Artificial Intelligence and Data Science</h3>
-    <div class="image-grid">
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314784/Ai_lab_vij8de.jpg" data-category="engineering-aids">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314784/Ai_lab_vij8de.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314784/Ai_lab_vij8de.jpg" alt="AI Lab" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">AI Lab</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750400372/classrooms_gqo3fh.jpg" data-category="engineering-csbs">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750400372/classrooms_gqo3fh.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750400372/classrooms_gqo3fh.jpg" alt="Classrooms" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Classroom</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314614/Seminar_hall_izmnum.jpg" data-category="engineering-ece">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314614/Seminar_hall_izmnum.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314614/Seminar_hall_izmnum.jpg" alt="Seminar Hall" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Seminar Hall</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-    </div>
-</div>
+            <!-- Engineering Section with Department Tabs -->
+            <section id="engineering" class="section">
+                <div class="section-header">Engineering</div>
+                <div class="sub-nav-container" id="engineering-departments">
+                    <div class="sub-nav-menu">
+                        <a href="#eng-ece" class="sub-nav-item active" data-target="ece-content"><i class="fas fa-microchip"></i>ECE</a>
+                        <a href="#eng-cse" class="sub-nav-item " data-target="cse-content"><i class="fas fa-laptop-code"></i>CSE</a>
+                        <a href="#eng-eee" class="sub-nav-item" data-target="eee-content"><i class="fas fa-bolt"></i>EEE</a>
+                        <a href="#eng-it" class="sub-nav-item" data-target="it-content"><i class="fas fa-desktop"></i>IT</a>
+                        <a href="#eng-mech" class="sub-nav-item" data-target="mechanical-content"><i class="fas fa-cogs"></i>Mechanical</a>
+                        <a href="#eng-civil" class="sub-nav-item" data-target="civil-content"><i class="fas fa-hard-hat"></i>Civil</a>
+                        <a href="#eng-bme" class="sub-nav-item" data-target="bme-content"><i class="fas fa-stethoscope"></i>BME</a>
+                        <a href="#eng-mechatronics" class="sub-nav-item" data-target="mechatronics-content"><i class="fas fa-robot"></i>Mechatronics</a>
+                        <a href="#eng-ice" class="sub-nav-item" data-target="ice-content"><i class="fas fa-tools"></i>ICE</a>
+                        <a href="#eng-aids" class="sub-nav-item" data-target="aids-content"><i class="fas fa-brain"></i>AI&DS</a>
+                        <a href="#eng-csbs" class="sub-nav-item" data-target="csbs-content"><i class="fas fa-database"></i>CSEBS</a>
+                        <a href="#eng-cce" class="sub-nav-item" data-target="cce-content"><i class="fas fa-network-wired"></i>CCE</a>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <!-- ECE Department Content -->
+                    <div id="ece-content" class="department-content active">
+                        <h3 class="department-title">Electronics and Communication Engineering</h3>
+                        <div class="image-grid">
+                            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314611/Linear_integrated_circuits_gpehil.jpg" data-category="engineering-ece">
+                                <div class="image-placeholder"><i class="fas fa-image"></i></div>
+                                <picture>
+                                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314611/Linear_integrated_circuits_gpehil.webp" type="image/webp">
+                                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314611/Linear_integrated_circuits_gpehil.jpg" alt="Linear Integrated Circuits" class="lazy-image" loading="lazy" decoding="async">
+                                </picture>
+                                <div class="image-overlay"></div>
+                                <div class="image-caption">Linear Integrated Circuits</div>
+                                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
+                            </div>
+                            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314607/Electronic_devices_and_integrated_circuits_mm9jau.jpg" data-category="engineering-ece">
+                                <div class="image-placeholder"><i class="fas fa-image"></i></div>
+                                <picture>
+                                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314607/Electronic_devices_and_integrated_circuits_mm9jau.webp" type="image/webp">
+                                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314607/Electronic_devices_and_integrated_circuits_mm9jau.jpg" alt="Electronic Devices and Integrated Circuits" class="lazy-image" loading="lazy" decoding="async">
+                                </picture>
+                                <div class="image-overlay"></div>
+                                <div class="image-caption">Electronic Devices and Integrated Circuits</div>
+                                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
+                            </div>
+                        </div>
+                    </div>
 
-<!-- Mechanical Department Content -->
-<div id="mechanical-content" class="department-content">
-    <h3 class="department-title">Mechanical Engineering</h3>
-    <div class="image-grid">
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314321/Dynamics_of_machinery_mhjdvp.jpg" data-category="engineering-mechanical">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314321/Dynamics_of_machinery_mhjdvp.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314321/Dynamics_of_machinery_mhjdvp.jpg" alt="Dynamics of Machinery" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Dynamics of Machinery</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314320/CNC_s0d2l8.jpg" data-category="engineering-mechanical">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314320/CNC_s0d2l8.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314320/CNC_s0d2l8.jpg" alt="CNC" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">CNC</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314319/CAD_Lab_bk9zye.jpg" data-category="engineering-mechanical">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314319/CAD_Lab_bk9zye.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314319/CAD_Lab_bk9zye.jpg" alt="CAD Lab" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">CAD Lab</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314318/wood_router_riycax.jpg" data-category="engineering-mechanical">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314318/wood_router_riycax.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314318/wood_router_riycax.jpg" alt="Wood Router" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Wood Router</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314318/Manufacturing_and_technology_ntvqwi.jpg" data-category="engineering-mechanical">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314318/Manufacturing_and_technology_ntvqwi.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314318/Manufacturing_and_technology_ntvqwi.jpg" alt="Manufacturing and Technology" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Manufacturing and Technology</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314313/Simulation_lab_yyxw56.jpg" data-category="engineering-mechanical">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314313/Simulation_lab_yyxw56.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314313/Simulation_lab_yyxw56.jpg" alt="Simulation Lab" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Simulation Lab</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314311/Mechanical_measurement_and_metrology_lygkvp.jpg" data-category="engineering-mechanical">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314311/Mechanical_measurement_and_metrology_lygkvp.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314311/Mechanical_measurement_and_metrology_lygkvp.jpg" alt="Mechanical Measurement and Metrology" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Mechanical Measurement and Metrology</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750400372/classrooms_gqo3fh.jpg" data-category="engineering-csbs">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750400372/classrooms_gqo3fh.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750400372/classrooms_gqo3fh.jpg" alt="Classrooms" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Classroom</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314614/Seminar_hall_izmnum.jpg" data-category="engineering-ece">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314614/Seminar_hall_izmnum.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314614/Seminar_hall_izmnum.jpg" alt="Seminar Hall" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Seminar Hall</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-    </div>
-</div>
+                    <!-- CSE Department Content -->
+                    <div id="cse-content" class="department-content">
+                        <h3 class="department-title">Computer Science Engineering</h3>
+                        <div class="image-grid">
+                            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314547/Centre_I_pd2doa.jpg" data-category="engineering-cse">
+                                <div class="image-placeholder"><i class="fas fa-image"></i></div>
+                                <picture>
+                                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314547/Centre_I_pd2doa.webp" type="image/webp">
+                                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314547/Centre_I_pd2doa.jpg" alt="Centre I" class="lazy-image" loading="lazy" decoding="async">
+                                </picture>
+                                <div class="image-overlay"></div>
+                                <div class="image-caption">Centre I</div>
+                                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
+                            </div>
+                        </div>
+                    </div>
 
-<!-- Mechatronics Department Content -->
-<div id="mechatronics-content" class="department-content">
-    <h3 class="department-title">Mechatronics Engineering</h3>
-    <div class="image-grid">
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314478/Sensors_and_transduers_lab_formphotoeditor.com_ob4pkn.jpg" data-category="engineering-mechatronics">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314478/Sensors_and_transduers_lab_formphotoeditor.com_ob4pkn.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314478/Sensors_and_transduers_lab_formphotoeditor.com_ob4pkn.jpg" alt="Sensors and Transducers Lab" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Sensors and Transducers Lab</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314477/Robootics_Lab_formphotoeditor.com_hr14w2.jpg" data-category="engineering-mechatronics">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314477/Robootics_Lab_formphotoeditor.com_hr14w2.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314477/Robootics_Lab_formphotoeditor.com_hr14w2.jpg" alt="Robotics Lab" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Robotics Lab</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750400372/classrooms_gqo3fh.jpg" data-category="engineering-csbs">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750400372/classrooms_gqo3fh.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750400372/classrooms_gqo3fh.jpg" alt="Classrooms" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Classroom</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314614/Seminar_hall_izmnum.jpg" data-category="engineering-ece">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314614/Seminar_hall_izmnum.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314614/Seminar_hall_izmnum.jpg" alt="Seminar Hall" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Seminar Hall</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-    </div>
-</div>
+                    <!-- Add other department contents here as needed -->
+                </div>
+            </section>
 
+            <!-- Ethno Tech Section -->
+            <section id="ethno-tech" class="section">
+                <div class="section-header">Ethno Tech</div>
+                <div class="section-content">
+                    <div class="image-grid">
+                        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314915/Schneider_I_olttyi.jpg" data-category="ethno-tech">
+                            <div class="image-placeholder"><i class="fas fa-image"></i></div>
+                            <picture>
+                                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314915/Schneider_I_olttyi.webp" type="image/webp">
+                                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314915/Schneider_I_olttyi.jpg" alt="Schneider I" class="lazy-image" loading="lazy" decoding="async">
+                            </picture>
+                            <div class="image-overlay"></div>
+                            <div class="image-caption">Schneider I</div>
+                            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-<!-- CSE Department Content -->
-<div id="cse-content" class="department-content">
-    <h3 class="department-title">Computer Science Engineering</h3>
-    <div class="image-grid">
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314547/Centre_I_pd2doa.jpg" data-category="engineering-cse">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314547/Centre_I_pd2doa.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314547/Centre_I_pd2doa.jpg" alt="Centre I" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Centre I</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314546/Centre_13_formphotoeditor.com_iwvazj.jpg" data-category="engineering-cse">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314546/Centre_13_formphotoeditor.com_iwvazj.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314546/Centre_13_formphotoeditor.com_iwvazj.jpg" alt="Centre 13" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Centre 13</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314544/Seminar_Hall_formphotoeditor.com_ozxoce.jpg" data-category="engineering-cse">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314544/Seminar_Hall_formphotoeditor.com_ozxoce.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314544/Seminar_Hall_formphotoeditor.com_ozxoce.jpg" alt="Seminar Hall" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Seminar Hall</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314542/Placement_lab_formphotoeditor.com_azj3zj.jpg" data-category="engineering-cse">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314542/Placement_lab_formphotoeditor.com_azj3zj.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314542/Placement_lab_formphotoeditor.com_azj3zj.jpg" alt="Placement Lab" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Placement Lab</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750400372/classrooms_gqo3fh.jpg" data-category="engineering-csbs">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750400372/classrooms_gqo3fh.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750400372/classrooms_gqo3fh.jpg" alt="Classrooms" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Classroom</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-    </div>
-</div>
+            <!-- AICTE Section -->
+            <section id="aicte" class="section">
+                <div class="section-header">AICTE</div>
+                <div class="section-content">
+                    <div class="image-grid">
+                        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315367/mechanical_section_dgx6gm.jpg" data-category="aicte">
+                            <div class="image-placeholder"><i class="fas fa-image"></i></div>
+                            <picture>
+                                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315367/mechanical_section_dgx6gm.webp" type="image/webp">
+                                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315367/mechanical_section_dgx6gm.jpg" alt="Mechanical Section" class="lazy-image" loading="lazy" decoding="async">
+                            </picture>
+                            <div class="image-overlay"></div>
+                            <div class="image-caption">Mechanical Section</div>
+                            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-<!-- Civil Department Content -->
-<div id="civil-content" class="department-content">
-    <h3 class="department-title">Civil Engineering</h3>
-    <div class="image-grid">
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314852/Civil_engineering_lab_q7xorg.jpg" data-category="engineering-civil">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314852/Civil_engineering_lab_q7xorg.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314852/Civil_engineering_lab_q7xorg.jpg" alt="Civil Engineering Lab" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Civil Engineering Lab</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750400372/classrooms_gqo3fh.jpg" data-category="engineering-csbs">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750400372/classrooms_gqo3fh.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750400372/classrooms_gqo3fh.jpg" alt="Classrooms" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Classroom</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314614/Seminar_hall_izmnum.jpg" data-category="engineering-ece">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314614/Seminar_hall_izmnum.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314614/Seminar_hall_izmnum.jpg" alt="Seminar Hall" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Seminar Hall</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-    </div>
-</div>
+            <!-- Law Block Section -->
+            <section id="law-block" class="section">
+                <div class="section-header">Law Block</div>
+                <div class="section-content">
+                    <div class="image-grid">
+                        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314001/infrastructure_ndamag.jpg" data-category="law-block">
+                            <div class="image-placeholder"><i class="fas fa-image"></i></div>
+                            <picture>
+                                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314001/infrastructure_ndamag.webp" type="image/webp">
+                                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314001/infrastructure_ndamag.jpg" alt="Infrastructure" class="lazy-image" loading="lazy" decoding="async">
+                            </picture>
+                            <div class="image-overlay"></div>
+                            <div class="image-caption">Infrastructure</div>
+                            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-<!-- IT Department Content -->
-<div id="it-content" class="department-content">
-    <h3 class="department-title">Information Technology</h3>
-    <div class="image-grid">
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314754/APA_Lab_formphotoeditor.com_yk2yau.jpg" data-category="engineering-it">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314754/APA_Lab_formphotoeditor.com_yk2yau.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314754/APA_Lab_formphotoeditor.com_yk2yau.jpg" alt="APA Lab" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">APA Lab</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750400372/classrooms_gqo3fh.jpg" data-category="engineering-csbs">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750400372/classrooms_gqo3fh.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750400372/classrooms_gqo3fh.jpg" alt="Classrooms" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Classroom</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314614/Seminar_hall_izmnum.jpg" data-category="engineering-ece">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314614/Seminar_hall_izmnum.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314614/Seminar_hall_izmnum.jpg" alt="Seminar Hall" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Seminar Hall</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-    </div>
-</div>
+            <!-- Agriculture Section -->
+            <section id="agriculture" class="section">
+                <div class="section-header">Agriculture</div>
+                <div class="section-content">
+                    <div class="image-grid">
+                        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315290/Soil_Science_rs1tyw.jpg" data-category="agriculture">
+                            <div class="image-placeholder"><i class="fas fa-image"></i></div>
+                            <picture>
+                                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315290/Soil_Science_rs1tyw.webp" type="image/webp">
+                                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315290/Soil_Science_rs1tyw.jpg" alt="Soil Science" class="lazy-image" loading="lazy" decoding="async">
+                            </picture>
+                            <div class="image-overlay"></div>
+                            <div class="image-caption">Soil Science</div>
+                            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-<!-- BME Department Content -->
-<div id="bme-content" class="department-content">
-    <h3 class="department-title">Biomedical Engineering</h3>
-    <div class="image-grid">
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314820/Bio_medical_instrumental_lab_formphotoeditor.com_v7as1v.jpg" data-category="engineering-bme">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314820/Bio_medical_instrumental_lab_formphotoeditor.com_v7as1v.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314820/Bio_medical_instrumental_lab_formphotoeditor.com_v7as1v.jpg" alt="Bio Medical Instrumental Lab" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Bio Medical Instrumental Lab</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750400372/classrooms_gqo3fh.jpg" data-category="engineering-csbs">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750400372/classrooms_gqo3fh.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750400372/classrooms_gqo3fh.jpg" alt="Classrooms" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Classroom</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314614/Seminar_hall_izmnum.jpg" data-category="engineering-ece">
-            <!-- Continuing from BME Department Content -->
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314614/Seminar_hall_izmnum.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314614/Seminar_hall_izmnum.jpg" alt="Seminar Hall" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Seminar Hall</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-    </div>
-</div>
+            <!-- Pharmacy Section -->
+            <section id="pharmacy" class="section">
+                <div class="section-header">Pharmacy</div>
+                <div class="section-content">
+                    <div class="image-grid">
+                        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314168/Machine_room_cnu6jn.jpg" data-category="pharmacy">
+                            <div class="image-placeholder"><i class="fas fa-image"></i></div>
+                            <picture>
+                                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314168/Machine_room_cnu6jn.webp" type="image/webp">
+                                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314168/Machine_room_cnu6jn.jpg" alt="Machine Room" class="lazy-image" loading="lazy" decoding="async">
+                            </picture>
+                            <div class="image-overlay"></div>
+                            <div class="image-caption">Machine Room</div>
+                            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-<!-- EEE Department Content -->
-<div id="eee-content" class="department-content">
-    <h3 class="department-title">Electrical and Electronics Engineering</h3>
-    <div class="image-grid">
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750400184/Electrical_Machines_Lab_qfkak7.jpg" data-category="engineering-eee">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750400184/Electrical_Machines_Lab_qfkak7.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750400184/Electrical_Machines_Lab_qfkak7.jpg" alt="Electrical Machines Lab" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Electrical Machines Lab</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750400182/electric_vechical_lab_g1uuw8.jpg" data-category="engineering-eee">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750400182/electric_vechical_lab_g1uuw8.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750400182/electric_vechical_lab_g1uuw8.jpg" alt="Electric Vehicle Lab" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Electric Vehicle Lab</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750400372/classrooms_gqo3fh.jpg" data-category="engineering-csbs">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750400372/classrooms_gqo3fh.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750400372/classrooms_gqo3fh.jpg" alt="Classrooms" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Classroom</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314614/Seminar_hall_izmnum.jpg" data-category="engineering-ece">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314614/Seminar_hall_izmnum.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314614/Seminar_hall_izmnum.jpg" alt="Seminar Hall" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Seminar Hall</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-    </div>
-</div>
+            <!-- Architecture Section -->
+            <section id="architecture" class="section">
+                <div class="section-header">Architecture</div>
+                <div class="section-content">
+                    <div class="image-grid">
+                        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315211/wing_rmgec5.jpg" data-category="architecture">
+                            <div class="image-placeholder"><i class="fas fa-image"></i></div>
+                            <picture>
+                                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315211/wing_rmgec5.webp" type="image/webp">
+                                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315211/wing_rmgec5.jpg" alt="Wing" class="lazy-image" loading="lazy" decoding="async">
+                            </picture>
+                            <div class="image-overlay"></div>
+                            <div class="image-caption">Wing</div>
+                            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-<!-- CCE Department Content -->
-<div id="cce-content" class="department-content">
-    <h3 class="department-title">Computer and Communication Engineering</h3>
-    <div class="image-grid">
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750400372/classrooms_gqo3fh.jpg" data-category="engineering-csbs">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750400372/classrooms_gqo3fh.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750400372/classrooms_gqo3fh.jpg" alt="Classrooms" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Classroom</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314547/Centre_I_pd2doa.jpg" data-category="engineering-cse">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314547/Centre_I_pd2doa.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314547/Centre_I_pd2doa.jpg" alt="Centre I" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Centre I</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314614/Seminar_hall_izmnum.jpg" data-category="engineering-ece">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314614/Seminar_hall_izmnum.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314614/Seminar_hall_izmnum.jpg" alt="Seminar Hall" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Seminar Hall</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-    </div>
-</div>
-
-<!-- CSEBS Department Content -->
-<div id="csbs-content" class="department-content">
-    <h3 class="department-title">Computer Science and Engineering and Business Systems</h3>
-    <div class="image-grid">
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750400372/classrooms_gqo3fh.jpg" data-category="engineering-csbs">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750400372/classrooms_gqo3fh.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750400372/classrooms_gqo3fh.jpg" alt="Classrooms" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Classroom</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314548/Centre_II_formphotoeditor.com_jmfvsh.jpg" data-category="engineering-cse">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314548/Centre_II_formphotoeditor.com_jmfvsh.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314548/Centre_II_formphotoeditor.com_jmfvsh.jpg" alt="Centre II" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Centre II</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314614/Seminar_hall_izmnum.jpg" data-category="engineering-ece">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314614/Seminar_hall_izmnum.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314614/Seminar_hall_izmnum.jpg" alt="Seminar Hall" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Seminar Hall</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-    </div>
-</div>
-
-<!-- ICE Department Content -->
-<div id="ice-content" class="department-content">
-    <h3 class="department-title">Instrumentation and Control Engineering</h3>
-    <div class="image-grid">
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314707/Process_automation_lab_baeyh5.jpg" data-category="engineering-ice">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314707/Process_automation_lab_baeyh5.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314707/Process_automation_lab_baeyh5.jpg" alt="Process Automation Lab" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Process Automation Lab</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314708/Seminar_hall_lgi5jl.jpg" data-category="engineering-ice">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314708/Seminar_hall_lgi5jl.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314708/Seminar_hall_lgi5jl.jpg" alt="Seminar Hall" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Seminar Hall</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750400372/classrooms_gqo3fh.jpg" data-category="engineering-csbs">
-            <div class="image-placeholder"><i class="fas fa-image"></i></div>
-            <picture>
-                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750400372/classrooms_gqo3fh.webp" type="image/webp">
-                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750400372/classrooms_gqo3fh.jpg" alt="Classrooms" class="lazy-image" loading="lazy" decoding="async">
-            </picture>
-            <div class="image-overlay"></div>
-            <div class="image-caption">Classroom</div>
-            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-        </div>
-    </div>
-</div>
-    </div>
-</section>
-
-<!-- Ethnotech Section -->
-<section id="ethno-tech" class="section">
-    <div class="section-header">Ethno Tech</div>
-    <div class="section-content">
-        <div class="image-grid">
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314915/Schneider_I_olttyi.jpg" data-category="ethno-tech">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314915/Schneider_I_olttyi.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314915/Schneider_I_olttyi.jpg" alt="Schneider I" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Schneider I</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314917/Schneider_II_v1zaio.jpg" data-category="ethno-tech">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314917/Schneider_II_v1zaio.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314917/Schneider_II_v1zaio.jpg" alt="Schneider II" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Schneider II</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314895/Apple_qgopst.jpg" data-category="ethno-tech">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314895/Apple_qgopst.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314895/Apple_qgopst.jpg" alt="Apple" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Apple</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314912/Prometric_centre_ezszrt.jpg" data-category="ethno-tech">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314912/Prometric_centre_ezszrt.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314912/Prometric_centre_ezszrt.jpg" alt="Prometric Centre" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Prometric Centre</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314910/nvidia_i5yrzv.jpg" data-category="ethno-tech">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314910/nvidia_i5yrzv.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314910/nvidia_i5yrzv.jpg" alt="Nvidia" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Nvidia</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314907/mathworks_mergvq.jpg" data-category="ethno-tech">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314907/mathworks_mergvq.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314907/mathworks_mergvq.jpg" alt="Mathworks" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Mathworks</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314904/intel_p43z5a.jpg" data-category="ethno-tech">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314904/intel_p43z5a.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314904/intel_p43z5a.jpg" alt="Intel" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Intel</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314900/Festo_I_z42ocw.jpg" data-category="ethno-tech">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314900/Festo_I_z42ocw.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314900/Festo_I_z42ocw.jpg" alt="Festo I" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Festo I</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314902/Festo_II_ofmtxo.jpg" data-category="ethno-tech">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314902/Festo_II_ofmtxo.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314902/Festo_II_ofmtxo.jpg" alt="Festo II" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Festo II</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314897/ARVR_yndvtw.jpg" data-category="ethno-tech">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314897/ARVR_yndvtw.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314897/ARVR_yndvtw.jpg" alt="AR/VR" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">AR/VR</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314893/abb_01_lmld4h.jpg" data-category="ethno-tech">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314893/abb_01_lmld4h.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314893/abb_01_lmld4h.jpg" alt="ABB" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">ABB</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- AICTE Section -->
-<section id="aicte" class="section">
-    <div class="section-header">AICTE</div>
-    <div class="section-content">
-        <div class="image-grid">
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315367/mechanical_section_dgx6gm.jpg" data-category="aicte">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315367/mechanical_section_dgx6gm.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315367/mechanical_section_dgx6gm.jpg" alt="Mechanical Section" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Mechanical Section</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315364/iot_ulgus7.jpg" data-category="aicte">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315364/iot_ulgus7.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315364/iot_ulgus7.jpg" alt="IoT" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">IoT</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315361/electronic_product_design_ywed30.jpg" data-category="aicte">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315361/electronic_product_design_ywed30.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315361/electronic_product_design_ywed30.jpg" alt="Electronic Product Design" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Electronic Product Design</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315358/aicte_innovation_center_byu3t2.jpg" data-category="aicte">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315358/aicte_innovation_center_byu3t2.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315358/aicte_innovation_center_byu3t2.jpg" alt="AICTE Innovation Center" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">AICTE Innovation Center</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315355/additive_manufacturing_lab_aveqjl.jpg" data-category="aicte">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315355/additive_manufacturing_lab_aveqjl.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315355/additive_manufacturing_lab_aveqjl.jpg" alt="Additive Manufacturing Lab" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Additive Manufacturing Lab</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315352/seminar_hall_td1csb.jpg" data-category="aicte">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315352/seminar_hall_td1csb.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315352/seminar_hall_td1csb.jpg" alt="Seminar Hall" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Seminar Hall</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-        </div>
-    </div>
-</section>  
-
-<!-- Law Block Section -->
-<section id="law-block" class="section">
-    <div class="section-header">Law Block</div>
-    <div class="section-content">
-        <div class="image-grid">
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314001/infrastructure_ndamag.jpg" data-category="law-block">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314001/infrastructure_ndamag.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314001/infrastructure_ndamag.jpg" alt="Infrastructure" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Infrastructure</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-             <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314001/library_ggklw2.jpg" data-category="law-block">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314001/library_ggklw2.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314001/library_ggklw2.jpg" alt="Library" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Library</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750313999/moot_court_hawpun.jpg" data-category="law-block">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750313999/moot_court_hawpun.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750313999/moot_court_hawpun.jpg" alt="Moot Court" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Moot Court</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750313996/interactive_section_rrqhuw.jpg" data-category="law-block">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750313996/interactive_section_rrqhuw.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750313996/interactive_section_rrqhuw.jpg" alt="Interactive Section" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Interactive Session</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314001/cls_room_bnubpp.jpg" data-category="law-block">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314001/cls_room_bnubpp.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314001/cls_room_bnubpp.jpg" alt="Classroom" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Classroom</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314001/ethical_teaching_fxmqve.jpg" data-category="law-block">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314001/ethical_teaching_fxmqve.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314001/ethical_teaching_fxmqve.jpg" alt="Ethical Teaching" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Ethical Teaching</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Agriculture Section -->
-<section id="agriculture" class="section">
-    <div class="section-header">Agriculture</div>
-    <div class="section-content">
-        <div class="image-grid">
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315290/Soil_Science_rs1tyw.jpg" data-category="agriculture">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315290/Soil_Science_rs1tyw.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315290/Soil_Science_rs1tyw.jpg" alt="Soil Science" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Soil Science</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315288/Seed_Science_htnrgq.jpg" data-category="agriculture">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315288/Seed_Science_htnrgq.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315288/Seed_Science_htnrgq.jpg" alt="Seed Science" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Seed Science</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315285/rose_field_c4hhoa.jpg" data-category="agriculture">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315285/rose_field_c4hhoa.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315285/rose_field_c4hhoa.jpg" alt="Rose Field" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Rose Field</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315282/PLant_breeding_and_soil_science_dxnkvq.jpg" data-category="agriculture">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315282/PLant_breeding_and_soil_science_dxnkvq.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315282/PLant_breeding_and_soil_science_dxnkvq.jpg" alt="Plant Breeding and Soil Science" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Plant Breeding and Soil Science</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315280/Paddy_field_h16iem.jpg" data-category="agriculture">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315280/Paddy_field_h16iem.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315280/Paddy_field_h16iem.jpg" alt="Paddy Field" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Paddy Field</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315275/horticulture_kovnh9.jpg" data-category="agriculture">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315275/horticulture_kovnh9.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315275/horticulture_kovnh9.jpg" alt="Horticulture" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Horticulture</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315271/Entomology_vhtxfb.jpg" data-category="agriculture">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315271/Entomology_vhtxfb.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315271/Entomology_vhtxfb.jpg" alt="Entomology" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Entomology</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314249/cls_room_z4chwp.jpg" data-category="agriculture">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314249/cls_room_z4chwp.jpg" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314249/cls_room_z4chwp.jpg" alt="Classroom" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Classroom</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315266/Banana_field_gdpi6w.jpg" data-category="agriculture">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315266/Banana_field_gdpi6w.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315266/Banana_field_gdpi6w.jpg" alt="Banana Field" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Banana Field</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315260/Agricultural_field_cnbbpb.jpg" data-category="agriculture">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315260/Agricultural_field_cnbbpb.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315260/Agricultural_field_cnbbpb.jpg" alt="Agricultural Field" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Agricultural Field</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Pharmacy Section -->
-<section id="pharmacy" class="section">
-    <div class="section-header">Pharmacy</div>
-    <div class="section-content">
-        <div class="image-grid">
-            
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314168/Machine_room_cnu6jn.jpg" data-category="pharmacy">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314168/Machine_room_cnu6jn.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314168/Machine_room_cnu6jn.jpg" alt="Machine Room" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Machine Room</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314167/Instrumentation_lab_kp77i0.jpg" data-category="pharmacy">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314167/Instrumentation_lab_kp77i0.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314167/Instrumentation_lab_kp77i0.jpg" alt="Instrumentation Lab" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Instrumentation Lab</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314166/pharmacognosy_refs4x.jpg" data-category="pharmacy">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314166/pharmacognosy_refs4x.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314166/pharmacognosy_refs4x.jpg" alt="Pharmacognosy" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Pharmacognosy</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314166/Anatomy_and_physiology_mtwsqh.jpg" data-category="pharmacy">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314166/Anatomy_and_physiology_mtwsqh.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314166/Anatomy_and_physiology_mtwsqh.jpg" alt="Anatomy and Physiology" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Anatomy and Physiology</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314168/Classroom_rhaheo.jpg" data-category="pharmacy">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314168/Classroom_rhaheo.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314168/Classroom_rhaheo.jpg" alt="Classroom" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Classroom</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Architecture Section -->
-<section id="architecture" class="section">
-    <div class="section-header">Architecture</div>
-    <div class="section-content">
-        <div class="image-grid">
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315211/wing_rmgec5.jpg" data-category="architecture">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315211/wing_rmgec5.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315211/wing_rmgec5.jpg" alt="Wing" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Wing</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315189/library_hjvp5y.jpg" data-category="architecture">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315189/library_hjvp5y.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315189/library_hjvp5y.jpg" alt="Library" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Library</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315206/studio1_sp6liw.jpg" data-category="architecture">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315206/studio1_sp6liw.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315206/studio1_sp6liw.jpg" alt="Studio 1" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Studio 1</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315208/studio2_nuqker.jpg" data-category="architecture">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315208/studio2_nuqker.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315208/studio2_nuqker.jpg" alt="Studio 2" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Studio 2</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315200/seminar_hall_bxgmd9.jpg" data-category="architecture">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315200/seminar_hall_bxgmd9.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315200/seminar_hall_bxgmd9.jpg" alt="Seminar Hall" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Class Room</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315195/museum_halrgi.jpg" data-category="architecture">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315195/museum_halrgi.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315195/museum_halrgi.jpg" alt="Museum" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Museum</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315192/model_fh1ra8.jpg" data-category="architecture">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315192/model_fh1ra8.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315192/model_fh1ra8.jpg" alt="Model Making Lab" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Model Making Lab</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315186/computer_lab_hn1qu6.jpg" data-category="architecture">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315186/computer_lab_hn1qu6.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315186/computer_lab_hn1qu6.jpg" alt="Computer Lab" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Computer Lab</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Arts and Science Section -->
-<section id="arts-science" class="section">
-    <div class="section-header">Arts and Science</div>
-    <div class="section-content">
-        <div class="image-grid">
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314982/infrastructure_czemsi.jpg" data-category="arts-science">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314982/infrastructure_czemsi.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314982/infrastructure_czemsi.jpg" alt="Infrastructure" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Infrastructure</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314988/physics_lab_e2gdmk.jpg" data-category="arts-science">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314988/physics_lab_e2gdmk.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314988/physics_lab_e2gdmk.jpg" alt="Physics Lab" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Physics Lab</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-             <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315000/chemistry_lab_jfdxou.jpg" data-category="arts-science">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315000/chemistry_lab_jfdxou.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315000/chemistry_lab_jfdxou.jpg" alt="Chemistry Lab" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Chemistry Lab</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314986/nutrition_lab_jz1djo.jpg" data-category="arts-science">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314986/nutrition_lab_jz1djo.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314986/nutrition_lab_jz1djo.jpg" alt="Nutrition Lab" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Nutrition Lab</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314993/bio_tech_lab_q1m1lx.jpg" data-category="arts-science">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314993/bio_tech_lab_q1m1lx.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314993/bio_tech_lab_q1m1lx.jpg" alt="Bio Tech Lab" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Bio Tech Lab</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314990/av_lab_saucso.jpg" data-category="arts-science">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314990/av_lab_saucso.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314990/av_lab_saucso.jpg" alt="AV Lab" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">AV Lab</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314980/green_matt_studio_actk8p.jpg" data-category="arts-science">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314980/green_matt_studio_actk8p.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314980/green_matt_studio_actk8p.jpg" alt="Green Matt Studio" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Green Matt Studio</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314979/editing_lab_vx2jgu.jpg" data-category="arts-science">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314979/editing_lab_vx2jgu.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314979/editing_lab_vx2jgu.jpg" alt="Editing Lab" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Editing Lab</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315003/cls_room_1_tplr7h.jpg" data-category="arts-science">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315003/cls_room_1_tplr7h.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750315003/cls_room_1_tplr7h.jpg" alt="Classroom 1" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Classroom </div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-             <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314996/center_3_y4lmur.jpg" data-category="arts-science">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314996/center_3_y4lmur.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314996/center_3_y4lmur.jpg" alt="Center 3" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Center 3</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-            <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314998/center_4_j7c4zh.jpg" data-category="arts-science">
-                <div class="image-placeholder"><i class="fas fa-image"></i></div>
-                <picture>
-                    <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314998/center_4_j7c4zh.webp" type="image/webp">
-                    <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314998/center_4_j7c4zh.jpg" alt="Center 4" class="lazy-image" loading="lazy" decoding="async">
-                </picture>
-                <div class="image-overlay"></div>
-                <div class="image-caption">Center 4</div>
-                <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
-            </div>
-        </div>
-    </div>
-</section>
+            <!-- Arts and Science Section -->
+            <section id="arts-science" class="section">
+                <div class="section-header">Arts and Science</div>
+                <div class="section-content">
+                    <div class="image-grid">
+                        <div class="image-item" data-type="image" data-src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1750314982/infrastructure_czemsi.jpg" data-category="arts-science">
+                            <div class="image-placeholder"><i class="fas fa-image"></i></div>
+                            <picture>
+                                <source srcset="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314982/infrastructure_czemsi.webp" type="image/webp">
+                                <img src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_300/v1750314982/infrastructure_czemsi.jpg" alt="Infrastructure" class="lazy-image" loading="lazy" decoding="async">
+                            </picture>
+                            <div class="image-overlay"></div>
+                            <div class="image-caption">Infrastructure</div>
+                            <div class="view-indicator"><i class="fas fa-vr-cardboard"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
         </div>
     </div>
@@ -2345,14 +383,16 @@
     <!-- Media info overlay -->
     <div id="media-info" class="media-info">Currently viewing: <strong id="current-media-name"></strong></div>
    
+
     <!-- Control panel for horizontal navigation -->
     <div id="control-panel">
         <button id="prev-btn" class="control-btn"><i class="fas fa-chevron-left"></i></button>
-        <button id="vr-toggle" class="control-btn"><i class="fas fa-expand-arrows-alt"></i></button>
+        <button id="vr-toggle" class="control-btn"><i class="fas fa-vr-cardboard"></i></button>
+        <button id="fullscreen-btn" class="control-btn"><i class="fas fa-expand"></i></button>
         <button id="next-btn" class="control-btn"><i class="fas fa-chevron-right"></i></button>
     </div>
     
-    <!-- Simplified vertical navigation controls (removed center button) -->
+    <!-- Simplified vertical navigation controls -->
     <div class="vr-navigation-controls" id="vr-nav-controls">
         <button id="look-up-btn" class="vr-nav-btn"><i class="fas fa-chevron-up"></i></button>
         <button id="look-down-btn" class="vr-nav-btn"><i class="fas fa-chevron-down"></i></button>
@@ -2360,661 +400,21 @@
    
     <!-- A-Frame scene for VR -->
     <div id="vr-container">
-        <a-scene embedded vr-mode-ui="enabled: true" renderer="antialias: true; colorManagement: true; physicallyCorrectLights: true" loading-screen="enabled: false">
+        <a-scene embedded vr-mode-ui="enabled: true" renderer="antialias: true; colorManagement: true; physicallyCorrectLights: true" loading-screen="enabled: false" device-orientation-permission-ui="enabled: true">
             <a-assets timeout="10000">
                 <img id="skybox-placeholder" src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1743753190/20250404_131710_587_formphotoeditor.com_wjfmhk.jpg" crossorigin="anonymous">
             </a-assets>
             <a-sky id="main-sky" src="#skybox-placeholder" rotation="0 -90 0"></a-sky>
             <a-entity position="0 1.6 0">
-                <a-camera id="main-camera" look-controls="reverseMouseDrag: false; touchEnabled: true; magicWindowTrackingEnabled: true" wasd-controls="acceleration: 100" rotation="0 0 0">
-                </a-camera>
+                <a-camera id="main-camera" 
+                    look-controls="reverseMouseDrag: false; touchEnabled: true; magicWindowTrackingEnabled: true; pointerLockEnabled: false" 
+                    wasd-controls="acceleration: 100" 
+                    rotation="0 0 0"
+                    cursor="rayOrigin: mouse">
             </a-entity>
         </a-scene>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Cache DOM elements
-            const elements = {
-                welcomeScreen: document.getElementById('welcome-screen'),
-                enterButton: document.getElementById('enter-button'),
-                homePage: document.getElementById('home-page'),
-                backToHome: document.getElementById('back-to-home'),
-                mediaInfo: document.getElementById('media-info'),
-                currentMediaName: document.getElementById('current-media-name'),
-                prevBtn: document.getElementById('prev-btn'),
-                nextBtn: document.getElementById('next-btn'),
-                vrToggle: document.getElementById('vr-toggle'),
-                vrContainer: document.getElementById('vr-container'),
-                controlPanel: document.getElementById('control-panel'),
-                loadingMessage: document.getElementById('loading-message'),
-                backToTop: document.getElementById('back-to-top'),
-                navItems: document.querySelectorAll('.nav-item'),
-                sections: document.querySelectorAll('.section'),
-                vrNavControls: document.getElementById('vr-nav-controls'),
-                lookUpBtn: document.getElementById('look-up-btn'),
-                lookDownBtn: document.getElementById('look-down-btn'),
-                mainCamera: document.getElementById('main-camera'),
-                imageItems: document.querySelectorAll('.image-item'),
-                mainSky: document.querySelector('#main-sky'),
-                assets: document.querySelector('a-assets')
-            };
-            
-            // Global state
-            const state = {
-                currentMediaIndex: -1,
-                currentCategory: 'campus',
-                isVRMode: false,
-                skyImageLoaded: false,
-                cameraRotation: { x: 0, y: -90, z: 0 },
-                isTransitioning: false,
-                ROTATION_STEP: 15,
-                isInVRView: false // Track if we're in VR view
-            };
-            
-            // Setup lazy loading
-            function setupLazyLoading() {
-                const lazyImages = document.querySelectorAll('.lazy-image');
-                
-                if ('IntersectionObserver' in window) {
-                    const lazyImageObserver = new IntersectionObserver((entries) => {
-                        entries.forEach(entry => {
-                            if (entry.isIntersecting) {
-                                const img = entry.target;
-                                // Check if the image is inside a <picture> element
-                                const pictureElement = img.closest('picture');
-                                if (pictureElement) {
-                                    // For <picture> elements, the browser handles srcset/source selection.
-                                    // We just need to ensure the 'src' attribute is set for the <img> inside.
-                                    // The 'data-src' on the parent 'image-item' is for the 360 view, not the thumbnail.
-                                    // The actual thumbnail src is already set in the <source> and <img> tags.
-                                    // We can remove the 'data-src' attribute from the <img> if it's not used for the thumbnail itself.
-                                    // For lazy loading, the browser will handle 'loading="lazy"'.
-                                    // The 'data-src' on the image-item is for the full 360 image, not the thumbnail.
-                                    // The thumbnail itself should load via its 'src' or 'srcset'.
-                                    // The current lazy loading logic is for the <img> tag directly.
-                                    // We need to adjust it to work with <picture> if the thumbnail itself is lazy-loaded.
-                                    // For now, the `loading="lazy"` on the <img> tag within <picture> is sufficient.
-                                    // The `loadImageWithFallback` function is primarily for the 360 view.
-                                    
-                                    // Remove the placeholder once the image is loaded
-                                    const parent = img.closest('.image-item');
-                                    if (parent) {
-                                        const placeholder = parent.querySelector('.image-placeholder');
-                                        if (placeholder) {
-                                            placeholder.style.opacity = '0';
-                                            setTimeout(() => placeholder.remove(), 300);
-                                        }
-                                        setTimeout(() => {
-                                            parent.classList.add('loaded');
-                                        }, 100);
-                                    }
-                                } else {
-                                    // Original lazy loading logic for direct <img> tags
-                                    const src = img.getAttribute('data-src'); // This data-src is for the 360 view, not the thumbnail
-                                    if (src) {
-                                        // This part of the code is for the 360 view, not the thumbnail.
-                                        // The thumbnail itself should load via its 'src' or 'srcset'.
-                                        // The `loadImageWithFallback` is not directly applicable to the thumbnail's initial load.
-                                        // The `loading="lazy"` and `<picture>` element handle the thumbnail loading.
-                                        // This `if (src)` block might be redundant for the thumbnail itself if it's within <picture>.
-                                        // It's important to distinguish between the thumbnail image and the 360 panorama image.
-                                        // The `data-src` on `image-item` is for the 360 panorama.
-                                        // The `src` and `srcset` within `<picture>` are for the thumbnail.
-                                        // The `lazy-image` class is on the `<img>` tag within `<picture>`.
-                                        // So, the `IntersectionObserver` will observe the `<img>` tag.
-                                        // When it becomes visible, `loading="lazy"` will trigger the browser to load the image.
-                                        // The `loadImageWithFallback` function is not needed for the thumbnail itself.
-                                        // It's only for the full 360 panorama when a user clicks on a thumbnail.
-                                    }
-                                }
-                                lazyImageObserver.unobserve(img);
-                            }
-                        });
-                    }, {
-                        rootMargin: '100px 0px',
-                        threshold: 0.01
-                    });
-                    
-                    lazyImages.forEach(img => {
-                        lazyImageObserver.observe(img);
-                    });
-                } else {
-                    // Fallback for browsers without IntersectionObserver
-                    lazyImages.forEach(img => {
-                        const pictureElement = img.closest('picture');
-                        if (pictureElement) {
-                            // For <picture> elements, the browser handles srcset/source selection.
-                            // Just ensure the <img> has a valid src for non-lazy loading fallback.
-                            // The `loading="lazy"` attribute will be ignored by older browsers,
-                            // so they will load the image immediately.
-                            const parent = img.closest('.image-item');
-                            if (parent) {
-                                const placeholder = parent.querySelector('.image-placeholder');
-                                if (placeholder) {
-                                    placeholder.style.opacity = '0';
-                                    setTimeout(() => placeholder.remove(), 300);
-                                }
-                                setTimeout(() => {
-                                    parent.classList.add('loaded');
-                                }, 100);
-                            }
-                        } else {
-                            // Original fallback for direct <img> tags (if any remain)
-                            const src = img.getAttribute('data-src');
-                            if (src) {
-                                img.src = src;
-                                img.closest('.image-item')?.classList.add('loaded');
-                            }
-                        }
-                    });
-                }
-            }
-            
-            // Load image with fallback (This function is for the 360 panorama, not the thumbnail)
-            function loadImageWithFallback(imgElement, src) {
-                const tempImg = new Image();
-                tempImg.onload = function() {
-                    imgElement.src = src;
-                };
-                tempImg.onerror = function() {
-                    console.warn('Error loading image:', src);
-                    const parent = imgElement.closest('.image-item');
-                    if (parent) parent.style.opacity = '0.5';
-                };
-                tempImg.src = src;
-            }
-            
-            // Animate sections
-            function setupSectionAnimation() {
-                if ('IntersectionObserver' in window) {
-                    const sectionObserver = new IntersectionObserver((entries) => {
-                        entries.forEach(entry => {
-                            if (entry.isIntersecting) {
-                                const section = entry.target;
-                                section.classList.add('visible');
-                            }
-                        });
-                    }, {
-                        rootMargin: '0px 0px -20% 0px',
-                        threshold: 0.1
-                    });
-                    
-                    elements.sections.forEach(section => {
-                        sectionObserver.observe(section);
-                    });
-                } else {
-                    elements.sections.forEach(section => {
-                        section.classList.add('visible');
-                    });
-                }
-            }
-            
-            // Load 360° image
-            function loadSkyTexture(imgSrc, mediaName, autoFullscreen = true) {
-                if (state.isTransitioning) return;
-                state.isTransitioning = true;
-                state.skyImageLoaded = false;
-                
-                elements.loadingMessage.style.display = 'block';
-                elements.loadingMessage.style.opacity = '1';
-                elements.loadingMessage.innerHTML = 'Loading 360° view...<div class="loading-spinner"></div>';
-                
-                // Reset camera rotation
-                state.cameraRotation = { x: 0, y: -90, z: 0 };
-                if (elements.mainCamera) {
-                    elements.mainCamera.setAttribute('rotation', `${state.cameraRotation.x} ${state.cameraRotation.y} ${state.cameraRotation.z}`);
-                }
-                
-                const img = new Image();
-                img.crossOrigin = 'anonymous';
-                
-                img.onload = function() {
-                    const oldImage = document.getElementById('current-sky-image');
-                    if (oldImage) {
-                        elements.assets.removeChild(oldImage);
-                    }
-                    
-                    const newImage = document.createElement('img');
-                    newImage.id = 'current-sky-image';
-                    newImage.src = imgSrc;
-                    newImage.setAttribute('crossorigin', 'anonymous');
-                    
-                    elements.assets.appendChild(newImage);
-                    elements.mainSky.setAttribute('src', '#current-sky-image');
-                    
-                    setTimeout(() => {
-                        elements.loadingMessage.style.opacity = '0';
-                        setTimeout(() => {
-                            elements.loadingMessage.style.display = 'none';
-                        }, 500);
-                        
-                        elements.currentMediaName.textContent = mediaName;
-                        elements.mediaInfo.innerHTML = `Currently viewing: <strong>${mediaName}</strong>`;
-                        elements.mediaInfo.classList.add('visible');
-                        elements.vrNavControls.style.display = 'flex';
-                        
-                        setTimeout(() => {
-                            elements.mediaInfo.classList.remove('visible');
-                        }, 4000);
-                        
-                        state.skyImageLoaded = true;
-                        state.isTransitioning = false;
-                        
-                        // Trigger auto-fullscreen only if this is the initial image load
-                        if (autoFullscreen && state.isInVRView && !state.isVRMode) {
-                            setTimeout(() => {
-                                state.isVRMode = true;
-                                elements.vrToggle.classList.add('active');
-                                enterFullscreenMode();
-                            }, 500);
-                        }
-                    }, 500);
-                };
-                
-                img.onerror = function(e) {
-                    console.error('Error loading 360° image:', imgSrc, e);
-                    elements.loadingMessage.innerHTML = 'Error loading image. Please try another view.<div class="loading-spinner" style="border-top-color: #ff5252;"></div>';
-                    
-                    setTimeout(() => {
-                        elements.backToHome.click();
-                        state.isTransitioning = false;
-                    }, 3000);
-                };
-                
-                img.src = imgSrc;
-            }
-            
-            // VR toggle function - FIXED: Only works when in VR view
-            function toggleVRMode() {
-                // Only allow VR toggle when already in VR view
-                if (!state.isInVRView) {
-                    showNotification('Please select an image first to enable VR mode');
-                    return;
-                }
-                
-                if (!state.isVRMode) {
-                    state.isVRMode = true;
-                    elements.vrToggle.classList.add('active');
-                    
-                    // Try WebXR first, then fallback to fullscreen
-                    if (navigator.xr) {
-                        navigator.xr.isSessionSupported('immersive-vr').then((supported) => {
-                            if (supported) {
-                                // WebXR VR mode
-                                showNotification('<i class="fas fa-vr-cardboard"></i> VR mode enabled');
-                            } else {
-                                enterFullscreenMode();
-                            }
-                        }).catch(() => {
-                            enterFullscreenMode();
-                        });
-                    } else {
-                        enterFullscreenMode();
-                    }
-                } else {
-                    state.isVRMode = false;
-                    elements.vrToggle.classList.remove('active');
-                    exitFullscreenMode();
-                    showNotification('<i class="fas fa-compress"></i> VR mode disabled');
-                }
-            }
-            
-            // Enter fullscreen mode
-            function enterFullscreenMode() {
-                const vrContainerElement = elements.vrContainer;
-                if (vrContainerElement.requestFullscreen) {
-                    vrContainerElement.requestFullscreen();
-                } else if (vrContainerElement.mozRequestFullScreen) {
-                    vrContainerElement.mozRequestFullScreen();
-                } else if (vrContainerElement.webkitRequestFullscreen) {
-                    vrContainerElement.webkitRequestFullscreen();
-                } else if (vrContainerElement.msRequestFullscreen) {
-                    vrContainerElement.msRequestFullscreen();
-                }
-                showNotification('<i class="fas fa-expand"></i> Fullscreen VR mode enabled');
-            }
-            
-            // Exit fullscreen mode
-            function exitFullscreenMode() {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                } else if (document.mozCancelFullScreen) {
-                    document.mozCancelFullScreen();
-                } else if (document.webkitExitFullscreen) {
-                    document.webkitExitFullscreen();
-                } else if (document.msExitFullscreen) {
-                    document.msExitFullscreen();
-                }
-            }
-            
-            // Show notification
-            function showNotification(message, duration = 2000) {
-                elements.mediaInfo.innerHTML = message;
-                elements.mediaInfo.classList.add('visible');
-                
-                setTimeout(() => {
-                    elements.mediaInfo.classList.remove('visible');
-                }, duration);
-            }
-            
-            // Look up function
-            function lookUp() {
-                if (!state.skyImageLoaded || state.isTransitioning) return;
-                
-                state.cameraRotation.x = Math.max(state.cameraRotation.x - state.ROTATION_STEP, -80);
-                elements.mainCamera.setAttribute('rotation', `${state.cameraRotation.x} ${state.cameraRotation.y} ${state.cameraRotation.z}`);
-                
-                elements.lookUpBtn.style.transform = 'scale(0.9)';
-                setTimeout(() => elements.lookUpBtn.style.transform = '', 200);
-            }
-            
-            // Look down function
-            function lookDown() {
-                if (!state.skyImageLoaded || state.isTransitioning) return;
-                
-                state.cameraRotation.x = Math.min(state.cameraRotation.x + state.ROTATION_STEP, 80);
-                elements.mainCamera.setAttribute('rotation', `${state.cameraRotation.x} ${state.cameraRotation.y} ${state.cameraRotation.z}`);
-                
-                elements.lookDownBtn.style.transform = 'scale(0.9)';
-                setTimeout(() => elements.lookDownBtn.style.transform = '', 200);
-            }
-            
-            // Handle image item click
-            function setupImageItemClicks() {
-                elements.imageItems.forEach(item => {
-                    item.addEventListener('click', function() {
-                        if (state.isTransitioning) return;
-                        
-                        // Get the data-src from the image-item for the 360 view
-                        const imgSrc = this.getAttribute('data-src');
-                        if (!imgSrc || imgSrc === '') {
-                            showNotification('<i class="fas fa-exclamation-triangle"></i> Image not available');
-                            return;
-                        }
-                        
-                        const mediaName = this.querySelector('.image-caption').textContent;
-                        const category = this.getAttribute('data-category');
-                        
-                        elements.homePage.style.opacity = '0';
-                        
-                        setTimeout(() => {
-                            elements.homePage.style.display = 'none';
-                            elements.vrContainer.style.display = 'block';
-                            elements.backToHome.style.display = 'block';
-                            elements.controlPanel.style.display = 'flex';
-                            elements.vrNavControls.style.display = 'flex';
-                            
-                            state.currentCategory = category;
-                            state.isInVRView = true; // Set VR view state
-                            const categoryItems = Array.from(document.querySelectorAll(`.image-item[data-category="${category}"]`));
-                            state.currentMediaIndex = categoryItems.indexOf(this);
-                            
-                            loadSkyTexture(imgSrc, mediaName);
-                        }, 500);
-                    });
-                });
-            }
-            
-            // Back to home
-            elements.backToHome.addEventListener('click', function() {
-                if (state.isTransitioning) return;
-                state.isTransitioning = true;
-                
-                if (state.isVRMode) {
-                    state.isVRMode = false;
-                    elements.vrToggle.classList.remove('active');
-                    exitFullscreenMode();
-                }
-                
-                elements.vrContainer.style.opacity = '0';
-                elements.backToHome.style.opacity = '0';
-                elements.controlPanel.style.opacity = '0';
-                elements.vrNavControls.style.opacity = '0';
-                
-                setTimeout(() => {
-                    elements.homePage.style.display = 'block';
-                    elements.vrContainer.style.display = 'none';
-                    elements.backToHome.style.display = 'none';
-                    elements.controlPanel.style.display = 'none';
-                    elements.vrNavControls.style.display = 'none';
-                    elements.mediaInfo.classList.remove('visible');
-                    elements.loadingMessage.style.display = 'none';
-                    
-                    state.isInVRView = false; // Reset VR view state
-                    
-                    setTimeout(() => {
-                        elements.homePage.style.opacity = '1';
-                        elements.vrContainer.style.opacity = '1';
-                        elements.backToHome.style.opacity = '1';
-                        elements.controlPanel.style.opacity = '1';
-                        elements.vrNavControls.style.opacity = '1';
-                        state.isTransitioning = false;
-                    }, 50);
-                }, 300);
-            });
-            
-            // Navigation controls
-            elements.prevBtn.addEventListener('click', function() {
-                if (!state.skyImageLoaded || state.isTransitioning) return;
-                
-                this.style.transform = 'scale(0.9)';
-                setTimeout(() => {
-                    this.style.transform = '';
-                }, 200);
-                
-                const categoryItems = Array.from(document.querySelectorAll(`.image-item[data-category="${state.currentCategory}"]`));
-                
-                if (state.currentMediaIndex > 0) {
-                    state.currentMediaIndex--;
-                    const prevImage = categoryItems[state.currentMediaIndex];
-                    const imgSrc = prevImage.getAttribute('data-src');
-                    const mediaName = prevImage.querySelector('.image-caption').textContent;
-                    
-                    loadSkyTexture(imgSrc, mediaName);
-                } else {
-                    this.classList.add('disabled');
-                    
-                    setTimeout(() => {
-                        this.classList.remove('disabled');
-                    }, 500);
-                    
-                    showNotification('<i class="fas fa-info-circle"></i> First item in this category');
-                }
-            });
-            
-            elements.nextBtn.addEventListener('click', function() {
-                if (!state.skyImageLoaded || state.isTransitioning) return;
-                
-                this.style.transform = 'scale(0.9)';
-                setTimeout(() => {
-                    this.style.transform = '';
-                }, 200);
-                
-                const categoryItems = Array.from(document.querySelectorAll(`.image-item[data-category="${state.currentCategory}"]`));
-                
-                if (state.currentMediaIndex < categoryItems.length - 1) {
-                    state.currentMediaIndex++;
-                    const nextImage = categoryItems[state.currentMediaIndex];
-                    const imgSrc = nextImage.getAttribute('data-src');
-                    const mediaName = nextImage.querySelector('.image-caption').textContent;
-                    
-                    loadSkyTexture(imgSrc, mediaName);
-                } else {
-                    this.classList.add('disabled');
-                    
-                    setTimeout(() => {
-                        this.classList.remove('disabled');
-                    }, 500);
-                    
-                    showNotification('<i class="fas fa-info-circle"></i> Last item in this category');
-                }
-            });
-            
-            // VR toggle button - FIXED
-            elements.vrToggle.addEventListener('click', function() {
-                this.style.transform = 'scale(0.9)';
-                setTimeout(() => {
-                    this.style.transform = '';
-                }, 200);
-                
-                toggleVRMode();
-            });
-            
-            // Vertical navigation controls
-            elements.lookUpBtn.addEventListener('click', lookUp);
-            elements.lookDownBtn.addEventListener('click', lookDown);
-            
-            // Welcome screen
-            elements.enterButton.addEventListener('click', function() {
-                elements.welcomeScreen.style.opacity = '0';
-                elements.welcomeScreen.style.transform = 'scale(1.1)';
-                
-                setTimeout(() => {
-                    elements.welcomeScreen.style.display = 'none';
-                    elements.homePage.style.display = 'block';
-                    
-                    setTimeout(() => {
-                        elements.homePage.style.opacity = '1';
-                        setupSectionAnimation();
-                        setupLazyLoading();
-                    }, 50);
-                }, 800);
-            });
-            
-            // Back to top visibility
-            window.addEventListener('scroll', throttle(function() {
-                if (window.scrollY > 300) {
-                    elements.backToTop.classList.add('visible');
-                } else {
-                    elements.backToTop.classList.remove('visible');
-                }
-                updateActiveNavItem();
-            }, 100));
-            
-            // Back to top functionality
-            elements.backToTop.addEventListener('click', function() {
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
-            });
-            
-            // Update active navigation
-            function updateActiveNavItem() {
-                let current = '';
-                let minDistance = Infinity;
-                
-                elements.sections.forEach(section => {
-                    const rect = section.getBoundingClientRect();
-                    const distance = Math.abs(rect.top - 200);
-                    
-                    if (distance < minDistance) {
-                        minDistance = distance;
-                        current = section.getAttribute('id');
-                    }
-                });
-                
-                if (current) {
-                    elements.navItems.forEach(item => {
-                        item.classList.remove('active');
-                        if (item.getAttribute('href').substring(1) === current) {
-                            item.classList.add('active');
-                        }
-                    });
-                    
-                    const engDepartments = document.getElementById('engineering-departments');
-                    if (engDepartments) {
-                        if (current === 'engineering') {
-                            engDepartments.classList.add('active');
-                        } else {
-                            engDepartments.classList.remove('active');
-                        }
-                    }
-                }
-            }
-            
-            // Navigation links
-            elements.navItems.forEach(item => {
-                item.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    
-                    elements.navItems.forEach(navItem => navItem.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    const targetId = this.getAttribute('href');
-                    const targetSection = document.querySelector(targetId);
-                    
-                    if (targetSection) {
-                        window.scrollTo({
-                            top: targetSection.offsetTop - 180,
-                            behavior: 'smooth'
-                        });
-                    }
-                });
-            });
-            
-            // Department tabs
-            function setupDepartmentTabs() {
-                const departmentTabs = document.querySelectorAll('.sub-nav-item');
-                const departmentContents = document.querySelectorAll('.department-content');
-                
-                departmentTabs.forEach(tab => {
-                    tab.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        
-                        departmentTabs.forEach(t => t.classList.remove('active'));
-                        this.classList.add('active');
-                        
-                        const targetId = this.getAttribute('data-target');
-                        departmentContents.forEach(content => {
-                            content.classList.remove('active');
-                        });
-                        
-                        const targetContent = document.getElementById(targetId);
-                        if (targetContent) {
-                            targetContent.classList.add('active');
-                        }
-                    });
-                });
-            }
-            
-            // Keyboard support
-            document.addEventListener('keydown', function(e) {
-                if (elements.vrContainer.style.display === 'block' && state.skyImageLoaded && !state.isTransitioning) {
-                    if (e.key === 'ArrowLeft') {
-                        elements.prevBtn.click();
-                    } else if (e.key === 'ArrowRight') {
-                        elements.nextBtn.click();
-                    } else if (e.key === 'Escape') {
-                        elements.backToHome.click();
-                    } else if (e.key === 'f' || e.key === 'F') {
-                        elements.vrToggle.click();
-                    } else if (e.key === 'ArrowUp') {
-                        lookUp();
-                    } else if (e.key === 'ArrowDown') {
-                        lookDown();
-                    }
-                }
-            });
-            
-            // Performance optimization
-            function throttle(callback, delay) {
-                let lastCall = 0;
-                return function(...args) {
-                    const now = new Date().getTime();
-                    if (now - lastCall < delay) {
-                        return;
-                    }
-                    lastCall = now;
-                    callback(...args);
-                };
-            }
-            
-            // Initialize
-            setupImageItemClicks();
-            setupDepartmentTabs();
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
