@@ -581,11 +581,20 @@ body {
     font-size: 1.1em;
     text-align: center;
     min-width: 300px;
+    display: block;
+    visibility: visible;
 }
 
 .media-info.visible {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
+}
+
+/* Force media info to be visible when in VR view */
+.media-info.show {
+    opacity: 1 !important;
+    transform: translateX(-50%) translateY(0) !important;
+    visibility: visible !important;
 }
 
 .media-info strong {
@@ -595,79 +604,141 @@ body {
     margin-top: 5px;
 }
 
+/* Enhanced Control Panel with Clean Bottom Layout */
 #control-panel {
     position: fixed;
-    bottom: 30px;
+    bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    display: none;
-    gap: 25px;
+    display: flex;
+    gap: 15px;
     z-index: 999;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 10px 20px;
+    border-radius: 50px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* Show control panel when VR container is visible */
+#vr-container:not([style*="display: none"]) + #control-panel,
+#vr-container[style*="display: block"] + #control-panel,
+body:has(#vr-container[style*="display: block"]) #control-panel {
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: flex !important;
+}
+
+#control-panel.visible,
+#control-panel.show {
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: flex !important;
 }
 
 .control-btn {
-    width: 70px;
-    height: 70px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 1);
     color: var(--primary-color);
-    border: none;
-    display: flex;
+    border: 2px solid rgba(54, 66, 155, 0.2);
+    display: flex !important;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    transition: all 0.4s ease;
+    transition: all 0.3s ease;
     font-weight: bold;
     font-family: 'Montserrat', sans-serif;
-    font-size: 1.5em;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    font-size: 1.2em;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+    opacity: 1;
+    visibility: visible;
 }
 
 .control-btn:hover {
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    background: var(--primary-color);
     color: white;
-    transform: translateY(-10px);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(54, 66, 155, 0.3);
+    border-color: var(--primary-color);
 }
 
 .control-btn.disabled {
-    opacity: 0.5;
+    opacity: 0.4;
     cursor: not-allowed;
+    background: rgba(200, 200, 200, 0.8);
+    color: #999;
+    border-color: rgba(200, 200, 200, 0.5);
 }
 
+.control-btn.disabled:hover {
+    transform: none;
+    background: rgba(200, 200, 200, 0.8);
+    color: #999;
+}
+
+/* Ensure specific buttons are visible */
+#prev-btn,
+#next-btn,
+#fullscreen-btn {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Enhanced VR Button */
 #vr-toggle {
-    position: relative;
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 1);
+    color: var(--accent-color);
     font-size: 1.2em;
-    font-weight: 600;
+    position: relative;
+    border: 2px solid rgba(255, 183, 0, 0.3);
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 
-#vr-toggle::after {
-    content: '';
-    position: absolute;
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
-    background-color: var(--accent-color);
-    top: 10px;
-    right: 10px;
-    transition: all 0.4s ease;
-    box-shadow: 0 0 10px rgba(255, 183, 0, 0.7);
+#vr-toggle:hover {
+    background: var(--accent-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 183, 0, 0.4);
+    border-color: var(--accent-color);
 }
 
-#vr-toggle.active::after {
-    background-color: #4CAF50;
-    box-shadow: 0 0 10px rgba(76, 175, 80, 0.7);
+#vr-toggle.active {
+    background: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+    box-shadow: 0 4px 12px rgba(255, 183, 0, 0.4);
+}
+
+.vr-label {
+    display: none; /* Hide the VR label for cleaner look */
 }
 
 #fullscreen-btn {
     position: relative;
-    font-size: 1.2em;
+    font-size: 1em;
     font-weight: 600;
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 
 #fullscreen-btn.active {
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    background: var(--primary-color);
     color: white;
+    border-color: var(--primary-color);
 }
 
 #vr-container {
@@ -738,11 +809,27 @@ body {
     z-index: 999;
 }
 
+.vr-nav-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 15px;
+    border-radius: 25px;
+    backdrop-filter: blur(10px);
+}
+
+.horizontal-controls {
+    flex-direction: row;
+    margin-top: 10px;
+}
+
 .vr-nav-btn {
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.9);
     color: var(--primary-color);
     border: none;
     display: flex;
@@ -757,26 +844,40 @@ body {
 .vr-nav-btn:hover {
     background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
     color: white;
-    transform: scale(1.1);
+    transform: scale(1.15);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.vr-nav-btn:active {
+    transform: scale(0.95);
+}
+
+.recenter-btn {
+    background: rgba(255, 183, 0, 0.9);
+    color: white;
+}
+
+.recenter-btn:hover {
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-light));
+    transform: scale(1.2);
 }
 
 .back-to-top {
     position: fixed;
-    bottom: 30px;
-    right: 30px;
-    width: 60px;
-    height: 60px;
+    bottom: 90px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
-    color: white;
-    border: none;
-    font-size: 1.5em;
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--primary-color);
+    border: 2px solid rgba(54, 66, 155, 0.2);
+    font-size: 1.2em;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     opacity: 0;
     transform: translateY(100px);
     transition: all 0.4s ease;
@@ -789,8 +890,85 @@ body {
 }
 
 .back-to-top:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 30px rgba(54, 66, 155, 0.4);
+    background: var(--primary-color);
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(54, 66, 155, 0.4);
+    border-color: var(--primary-color);
+}
+
+/* VR Mode Indicator */
+.vr-indicator {
+    position: fixed;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(76, 175, 80, 0.9);
+    color: white;
+    padding: 12px 25px;
+    border-radius: 50px;
+    display: none;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    z-index: 1001;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.vr-indicator i {
+    font-size: 1.3em;
+    animation: pulse 2s infinite;
+}
+
+/* Mobile orientation guide */
+.orientation-guide {
+    position: fixed;
+    bottom: 150px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 20px 30px;
+    border-radius: 15px;
+    display: none;
+    text-align: center;
+    z-index: 1000;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+.orientation-guide i {
+    font-size: 2em;
+    margin-bottom: 10px;
+    display: block;
+    animation: pulse 2s infinite;
+}
+
+.orientation-guide p {
+    margin: 0;
+    font-size: 1.1em;
+}
+
+/* Mobile VR Hint */
+#mobile-vr-hint {
+    position: fixed;
+    top: 150px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.85);
+    color: white;
+    padding: 15px 25px;
+    border-radius: 50px;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    z-index: 1000;
+    font-size: 0.95em;
+    text-align: center;
+    max-width: 90%;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
 }
 
 /* Image placeholder */
@@ -812,6 +990,188 @@ body {
     color: #999;
 }
 
+/* Force visibility when VR container is shown */
+body:has(#vr-container[style*="display: block"]) #control-panel,
+#vr-container[style*="display: block"] ~ #control-panel,
+#vr-container:not([style*="display: none"]) ~ #control-panel {
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: flex !important;
+    position: fixed !important;
+    bottom: 20px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 9999 !important;
+}
+
+/* Alternative approach - show when home page is hidden */
+#home-page[style*="display: none"] ~ #control-panel,
+body:has(#home-page[style*="display: none"]) #control-panel {
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: flex !important;
+    position: fixed !important;
+    bottom: 20px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 9999 !important;
+}
+
+/* Force all control buttons to be visible */
+#control-panel .control-btn,
+#prev-btn,
+#next-btn, 
+#vr-toggle,
+#fullscreen-btn {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    position: relative !important;
+    z-index: 10000 !important;
+}
+
+/* VR headset optimizations */
+@supports (display: flex) and (-webkit-overflow-scrolling: touch) {
+    #vr-container {
+        -webkit-overflow-scrolling: touch;
+        overflow: hidden;
+    }
+}
+
+/* Failsafe - Always show control panel when VR container is visible */
+#vr-container[style*="display: block"] {
+    /* This is a marker that VR is active */
+}
+
+#vr-container[style*="display: block"] ~ * #control-panel,
+#vr-container[style*="display: block"] + * #control-panel,
+body:not(:has(#home-page:not([style*="display: none"]))) #control-panel {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    position: fixed !important;
+    bottom: 20px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 9999 !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    padding: 10px 20px !important;
+    border-radius: 50px !important;
+    gap: 15px !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Debug visibility - remove in production */
+#control-panel.debug-visible {
+    border: 3px solid lime !important;
+    background: rgba(0, 255, 0, 0.2) !important;
+}
+
+/* Ensure all critical UI elements are visible when active */
+.ui-active #control-panel,
+.vr-scene-active #control-panel {
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: flex !important;
+    pointer-events: auto !important;
+}
+
+.ui-active .media-info,
+.vr-scene-active .media-info {
+    display: block !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+/* Override any hiding styles for buttons */
+#control-panel button,
+#control-panel .control-btn {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Media info specific overrides */
+#media-info {
+    display: block !important;
+    position: fixed !important;
+    z-index: 998 !important;
+}
+
+/* Control panel specific overrides */
+#control-panel {
+    display: flex !important;
+    position: fixed !important;
+    z-index: 999 !important;
+}
+
+/* Fullscreen mode enhancements */
+#vr-container:fullscreen {
+    background: #000;
+}
+
+#vr-container:-webkit-full-screen {
+    background: #000;
+}
+
+#vr-container:-moz-full-screen {
+    background: #000;
+}
+
+#vr-container:-ms-fullscreen {
+    background: #000;
+}
+
+/* A-Frame scene optimizations */
+a-scene {
+    touch-action: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* Cursor states for VR container */
+#vr-container {
+    cursor: grab;
+}
+
+#vr-container:active {
+    cursor: grabbing;
+}
+
+/* Loading state for images */
+.image-item.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 40px;
+    height: 40px;
+    margin: -20px 0 0 -20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--accent-color);
+    animation: spin 1s ease-in-out infinite;
+}
+
+/* Smooth transitions */
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Enhanced button states */
+.control-btn.active::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    border-radius: 50%;
+    border: 3px solid var(--accent-color);
+    animation: pulse 2s infinite;
+}
+
 /* Responsive adjustments */
 @media (max-width: 1024px) {
     #welcome-title {
@@ -827,13 +1187,28 @@ body {
     }
     
     .control-btn {
-        width: 60px;
-        height: 60px;
+        width: 45px;
+        height: 45px;
+        font-size: 1.1em;
+    }
+    
+    #vr-toggle {
+        width: 45px;
+        height: 45px;
+        font-size: 1.1em;
     }
     
     .vr-nav-btn {
         width: 45px;
         height: 45px;
+    }
+    
+    .back-to-top {
+        width: 45px;
+        height: 45px;
+        bottom: 80px;
+        right: 15px;
+        font-size: 1.1em;
     }
 }
 
@@ -884,10 +1259,22 @@ body {
         margin: 40px auto;
     }
     
+    #control-panel {
+        gap: 12px;
+        padding: 8px 16px;
+        bottom: 15px;
+    }
+    
     .control-btn {
-        width: 55px;
-        height: 55px;
-        font-size: 1.3em;
+        width: 42px;
+        height: 42px;
+        font-size: 1em;
+    }
+    
+    #vr-toggle {
+        width: 42px;
+        height: 42px;
+        font-size: 1em;
     }
     
     .back-to-home {
@@ -898,14 +1285,19 @@ body {
     }
     
     .back-to-top {
-        width: 50px;
-        height: 50px;
-        bottom: 20px;
-        right: 20px;
+        width: 42px;
+        height: 42px;
+        bottom: 70px;
+        right: 15px;
+        font-size: 1em;
     }
     
     .vr-navigation-controls {
         right: 15px;
+    }
+    
+    .vr-nav-section {
+        padding: 10px;
     }
     
     .vr-nav-btn {
@@ -946,10 +1338,30 @@ body {
         font-size: 1.1em;
     }
     
+    #control-panel {
+        gap: 10px;
+        padding: 6px 12px;
+        bottom: 10px;
+    }
+    
     .control-btn {
-        width: 50px;
-        height: 50px;
-        gap: 15px;
+        width: 38px;
+        height: 38px;
+        font-size: 0.9em;
+    }
+    
+    #vr-toggle {
+        width: 38px;
+        height: 38px;
+        font-size: 0.9em;
+    }
+    
+    .back-to-top {
+        width: 38px;
+        height: 38px;
+        bottom: 60px;
+        right: 10px;
+        font-size: 0.9em;
     }
     
     .vr-navigation-controls {
@@ -959,5 +1371,115 @@ body {
     .vr-nav-btn {
         width: 36px;
         height: 36px;
+        font-size: 0.9em;
     }
+}
+
+/* Enhanced control panel for mobile */
+@media (max-width: 768px) {
+    #control-panel {
+        bottom: 15px;
+        gap: 12px;
+        padding: 8px 16px;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 50px;
+        backdrop-filter: blur(10px);
+    }
+    
+    #control-panel.visible {
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+}
+
+/* Touch-friendly controls for mobile */
+@media (hover: none) and (pointer: coarse) {
+    .control-btn,
+    .vr-nav-btn {
+        transition: transform 0.1s ease;
+    }
+    
+    .control-btn:active {
+        transform: scale(0.9);
+    }
+    
+    .vr-nav-btn:active {
+        transform: scale(0.85);
+    }
+}
+
+/* Mobile landscape optimization */
+@media (max-width: 768px) and (orientation: landscape) {
+    #control-panel {
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        gap: 15px;
+        z-index: 999;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 6px 15px;
+        border-radius: 50px;
+    }
+    
+    #control-panel.visible {
+        opacity: 1 !important;
+        visibility: visible !important;
+        display: flex !important;
+    }
+    
+    .control-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 1);
+        color: var(--primary-color);
+        border: 2px solid rgba(54, 66, 155, 0.2);
+        display: flex !important;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: bold;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 1em;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        position: relative;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+    
+    .back-to-top {
+        bottom: 55px;
+        right: 10px;
+    }
+}
+
+/* Additional visibility ensures */
+body.vr-active #control-panel,
+body.vr-mode #control-panel,
+.vr-view #control-panel {
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: flex !important;
+}
+
+body.vr-active .media-info,
+body.vr-mode .media-info,
+.vr-view .media-info {
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: block !important;
+    transform: translateX(-50%) translateY(0) !important;
+}
+
+/* Failsafe for button visibility */
+#prev-btn, #next-btn, #vr-toggle, #fullscreen-btn {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    position: relative !important;
+    z-index: 1000 !important;
 }
