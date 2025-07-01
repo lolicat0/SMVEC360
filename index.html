@@ -4,6 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sri Manakula Vinayagar Engineering College VR Tour</title>
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/aframe/1.4.2/aframe.min.js" as="script">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
+    <link rel="preload" href="style.css" as="style">
+    
+    <!-- Preload hero images -->
+    <link rel="preload" href="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_400/v1743755020/Screenshot_2025-04-04_135259_egcpey.jpg" as="image">
+    <link rel="preload" href="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_800/v1743753190/20250404_131710_587_formphotoeditor.com_wjfmhk.jpg" as="image">
+    
+    <!-- DNS prefetch for external domains -->
+    <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="//res.cloudinary.com">
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/aframe/1.4.2/aframe.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
@@ -18,7 +32,7 @@
     <!-- Welcome Screen -->
     <div id="welcome-screen">
         <div class="welcome-content">
-            <img id="welcome-logo" src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1743755020/Screenshot_2025-04-04_135259_egcpey.png" alt="SMVEC University Logo">
+            <img id="welcome-logo" src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_400/v1743755020/Screenshot_2025-04-04_135259_egcpey.jpg" alt="SMVEC University Logo">
             <h1 id="welcome-title">Welcome to Sri Manakula Vinayagar Engineering College</h1>
             <p id="welcome-subtitle">Experience our prestigious campus through an immersive virtual reality tour.</p>
             <button id="enter-button"><i class="fas fa-vr-cardboard"></i> Begin Your Journey</button>
@@ -1443,7 +1457,7 @@
             embedded 
             vr-mode-ui="enabled: true" 
             device-orientation-permission-ui="enabled: true"
-            renderer="antialias: true; colorManagement: true; physicallyCorrectLights: true; alpha: true" 
+            renderer="antialias: true; colorManagement: true; physicallyCorrectLights: true; alpha: true; precision: mediump" 
             loading-screen="enabled: false"
             background="color: #000"
             cursor="rayOrigin: mouse"
@@ -1455,8 +1469,8 @@
             gearvr-controls
             daydream-controls>
             
-            <a-assets timeout="10000">
-                <img id="skybox-placeholder" src="https://res.cloudinary.com/dugxrvrs5/image/upload/v1743753190/20250404_131710_587_formphotoeditor.com_wjfmhk.jpg" crossorigin="anonymous">
+            <a-assets timeout="30000">
+                <img id="skybox-placeholder" src="https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_1024/v1743753190/20250404_131710_587_formphotoeditor.com_wjfmhk.jpg" crossorigin="anonymous">
             </a-assets>
             
             <a-sky id="main-sky" src="#skybox-placeholder" rotation="0 -90 0"></a-sky>
@@ -1532,6 +1546,10 @@
             </a-sphere>
         </a-scene>
     </div>
+    
+    <!-- Image preloader for critical 360 images -->
+    <div id="image-preloader" style="display: none;"></div>
+    
     <script src="script.js"></script>
 </body>
 </html>
