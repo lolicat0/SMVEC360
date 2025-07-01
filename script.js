@@ -1,5 +1,12 @@
-// Wait for DOM to be fully loaded
-document.addEventListener('DOMContentLoaded', function() {
+// Check if DOM is already loaded
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeVRTour);
+} else {
+    // DOM is already loaded
+    initializeVRTour();
+}
+
+function initializeVRTour() {
     console.log('DOM loaded, initializing VR Tour...');
     
     // Performance optimization - cache frequently used selectors
@@ -149,18 +156,21 @@ document.addEventListener('DOMContentLoaded', function() {
     // Setup optimized lazy loading with intersection observer
     function setupLazyLoading() {
         const lazyImages = document.querySelectorAll('.lazy-image');
-        
-        if ('IntersectionObserver' in window) {
+
+        // Detect mobile devices (simple check)
+        const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+
+        if ('IntersectionObserver' in window && !isMobile) {
             const lazyImageObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         const img = entry.target;
                         const pictureElement = img.closest('picture');
-                        
+
                         if (pictureElement) {
                             // Use optimized loading
                             img.setAttribute('data-loaded', 'true');
-                            
+
                             const parent = img.closest('.image-item');
                             if (parent) {
                                 const placeholder = parent.querySelector('.image-placeholder');
@@ -168,7 +178,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     placeholder.style.opacity = '0';
                                     setTimeout(() => placeholder.remove(), 300);
                                 }
-                                
+
                                 // Use requestAnimationFrame for smoother animation
                                 requestAnimationFrame(() => {
                                     parent.classList.add('loaded');
@@ -182,12 +192,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 rootMargin: '100px 0px',
                 threshold: 0.01
             });
-            
+
             lazyImages.forEach(img => {
                 lazyImageObserver.observe(img);
             });
         } else {
-            // Fallback with performance optimization
+            // Fallback for mobile or no IntersectionObserver support: load all images immediately
             lazyImages.forEach(img => {
                 img.setAttribute('data-loaded', 'true');
                 const parent = img.closest('.image-item');
@@ -1485,15 +1495,20 @@ document.addEventListener('DOMContentLoaded', function() {
     console.time('App Initialization');
     initialize();
     console.timeEnd('App Initialization');
-});
-
-// Additional safety measure - if DOM is already loaded
-if (document.readyState === 'loading') {
-    console.log('DOM is still loading...');
-} else {
-    console.log('DOM already loaded, running initialization...');
-    window.dispatchEvent(new Event('DOMContentLoaded'));
 }
+
+window.addEventListener('popstate', function(event) {
+    // If currently in VR view or not on home page, go back to home page
+    const vrContainer = document.getElementById('vr-container');
+    const homePage = document.getElementById('home-page');
+    if (vrContainer && homePage && vrContainer.style.display === 'block') {
+        // Call backToHomePage function to show home page
+        const backToHomeBtn = document.getElementById('back-to-home');
+        if (backToHomeBtn) {
+            backToHomeBtn.click();
+        }
+    }
+});
 
 // Service Worker registration for caching (optional performance boost)
 if ('serviceWorker' in navigator) {
