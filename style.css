@@ -89,7 +89,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('https://res.cloudinary.com/dugxrvrs5/image/upload/v1743753190/20250404_131710_587_formphotoeditor.com_wjfmhk.jpg');
+    background-image: url('https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_800/v1743753190/20250404_131710_587_formphotoeditor.com_wjfmhk.jpg');
     background-size: cover;
     background-position: center;
     opacity: 0.15;
@@ -186,7 +186,7 @@ body {
     position: relative;
     width: 100%;
     background: linear-gradient(rgba(5, 10, 35, 0.7), rgba(5, 10, 35, 0.7)), 
-              url('https://res.cloudinary.com/dugxrvrs5/image/upload/v1743753190/20250404_131710_587_formphotoeditor.com_wjfmhk.jpg') center/cover fixed no-repeat;
+              url('https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_1920/v1743753190/20250404_131710_587_formphotoeditor.com_wjfmhk.jpg') center/cover fixed no-repeat;
     overflow-y: auto;
     z-index: 1000;
     min-height: 100vh;
@@ -445,6 +445,7 @@ body {
     transform: translateZ(0);
     opacity: 0;
     transform: translateY(20px);
+    will-change: transform;
 }
 
 .image-item.loaded {
@@ -463,6 +464,7 @@ body {
     object-fit: cover;
     transition: transform 0.5s ease;
     background-color: #eee;
+    will-change: transform;
 }
 
 .image-item:hover img {
@@ -875,7 +877,7 @@ body:has(#vr-container[style*="display: block"]) #control-panel {
     font-size: 1.2em;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items :center;
     cursor: pointer;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     opacity: 0;
@@ -1170,6 +1172,78 @@ a-scene {
     border-radius: 50%;
     border: 3px solid var(--accent-color);
     animation: pulse 2s infinite;
+}
+
+/* Optimized image loading states */
+.image-item {
+    background: linear-gradient(135deg, #f5f5f5, #eeeeee);
+}
+
+.image-item img {
+    background: transparent;
+    object-fit: cover;
+    object-position: center;
+}
+
+/* WebP support detection */
+.webp .image-item picture source[type="image/webp"] {
+    display: block;
+}
+
+.no-webp .image-item picture source[type="image/webp"] {
+    display: none;
+}
+
+/* Lazy loading optimization */
+.lazy-image {
+    transition: opacity 0.3s ease;
+}
+
+.lazy-image[data-loaded="true"] {
+    opacity: 1;
+}
+
+.lazy-image[data-loaded="false"] {
+    opacity: 0;
+}
+
+/* Performance optimizations */
+.image-item,
+.control-btn,
+.nav-item {
+    contain: layout style paint;
+}
+
+/* Critical CSS for faster initial render */
+.above-fold {
+    contain: layout;
+}
+
+/* Preloader styles */
+#image-preloader {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+/* Enhanced performance for image grid */
+.image-grid {
+    contain: layout;
+    content-visibility: auto;
+    contain-intrinsic-size: 0 500px;
+}
+
+/* GPU acceleration for smooth animations */
+.image-item,
+.control-btn,
+.nav-item,
+.vr-nav-btn {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
 }
 
 /* Responsive adjustments */
@@ -1482,4 +1556,37 @@ body.vr-mode .media-info,
     visibility: visible !important;
     position: relative !important;
     z-index: 1000 !important;
+}
+
+/* Critical path CSS optimizations */
+.critical {
+    contain: layout style paint;
+}
+
+/* Reduce layout thrashing */
+.image-item {
+    contain: layout style;
+}
+
+/* Optimize for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .control-btn {
+        border-width: 3px;
+    }
+    
+    .nav-item {
+        border: 2px solid currentColor;
+    }
 }
