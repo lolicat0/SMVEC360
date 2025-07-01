@@ -2,36 +2,46 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM loaded, initializing VR Tour...');
     
-    // Cache DOM elements
-    const elements = {
-        welcomeScreen: document.getElementById('welcome-screen'),
-        enterButton: document.getElementById('enter-button'),
-        homePage: document.getElementById('home-page'),
-        backToHome: document.getElementById('back-to-home'),
-        mediaInfo: document.getElementById('media-info'),
-        currentMediaName: document.getElementById('current-media-name'),
-        prevBtn: document.getElementById('prev-btn'),
-        nextBtn: document.getElementById('next-btn'),
-        fullscreenBtn: document.getElementById('fullscreen-btn'),
-        vrContainer: document.getElementById('vr-container'),
-        controlPanel: document.getElementById('control-panel'),
-        loadingMessage: document.getElementById('loading-message'),
-        backToTop: document.getElementById('back-to-top'),
-        navItems: document.querySelectorAll('.nav-item'),
-        sections: document.querySelectorAll('.section'),
-        vrNavControls: document.getElementById('vr-nav-controls'),
-        lookUpBtn: document.getElementById('look-up-btn'),
-        lookDownBtn: document.getElementById('look-down-btn'),
-        mainCamera: document.getElementById('main-camera'),
-        imageItems: document.querySelectorAll('.image-item'),
-        mainSky: document.querySelector('#main-sky'),
-        assets: document.querySelector('a-assets'),
-        vrToggle: document.getElementById('vr-toggle'),
-        mobileVrHint: document.getElementById('mobile-vr-hint'),
-        lookLeftBtn: document.getElementById('look-left-btn'),
-        lookRightBtn: document.getElementById('look-right-btn'),
-        recenterBtn: document.getElementById('recenter-btn')
+    // Performance optimization - cache frequently used selectors
+    const selectors = {
+        welcomeScreen: '#welcome-screen',
+        enterButton: '#enter-button',
+        homePage: '#home-page',
+        backToHome: '#back-to-home',
+        mediaInfo: '#media-info',
+        currentMediaName: '#current-media-name',
+        prevBtn: '#prev-btn',
+        nextBtn: '#next-btn',
+        fullscreenBtn: '#fullscreen-btn',
+        vrContainer: '#vr-container',
+        controlPanel: '#control-panel',
+        loadingMessage: '#loading-message',
+        backToTop: '#back-to-top',
+        navItems: '.nav-item',
+        sections: '.section',
+        vrNavControls: '#vr-nav-controls',
+        lookUpBtn: '#look-up-btn',
+        lookDownBtn: '#look-down-btn',
+        mainCamera: '#main-camera',
+        imageItems: '.image-item',
+        mainSky: '#main-sky',
+        assets: 'a-assets',
+        vrToggle: '#vr-toggle',
+        mobileVrHint: '#mobile-vr-hint',
+        lookLeftBtn: '#look-left-btn',
+        lookRightBtn: '#look-right-btn',
+        recenterBtn: '#recenter-btn'
     };
+    
+    // Cache DOM elements with performance optimization
+    const elements = {};
+    Object.keys(selectors).forEach(key => {
+        if (selectors[key].startsWith('.')) {
+            elements[key] = document.querySelectorAll(selectors[key]);
+        } else {
+            elements[key] = document.querySelector(selectors[key]);
+        }
+    });
     
     // Check if essential elements exist
     if (!elements.enterButton) {
@@ -41,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('Enter button found:', elements.enterButton);
     
-    // Global state
+    // Global state with performance optimizations
     const state = {
         currentMediaIndex: -1,
         currentCategory: 'campus',
@@ -57,10 +67,86 @@ document.addEventListener('DOMContentLoaded', function() {
         touchStartRotation: { x: 0, y: 0 },
         isWebXRSupported: false,
         vrSession: null,
-        isMouseDown: false
+        isMouseDown: false,
+        imageCache: new Map(),
+        preloadedImages: new Set(),
+        loadingQueue: []
     };
     
-    // Setup lazy loading
+    // Image preloading and caching system
+    const ImageLoader = {
+        cache: new Map(),
+        loadingPromises: new Map(),
+        
+        // Preload critical images
+        preloadCritical: function() {
+            const criticalImages = [
+                'https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_1024/v1743753190/20250404_131710_587_formphotoeditor.com_wjfmhk.jpg',
+                'https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315076/entrance_jgbfdn.jpg',
+                'https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315079/kovil_xj0psx.jpg',
+                'https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315074/central_library_oxukdy.jpg'
+            ];
+            
+            criticalImages.forEach(url => this.preload(url));
+        },
+        
+        // Preload image with promise caching
+        preload: function(url) {
+            if (this.cache.has(url)) {
+                return Promise.resolve(this.cache.get(url));
+            }
+            
+            if (this.loadingPromises.has(url)) {
+                return this.loadingPromises.get(url);
+            }
+            
+            const promise = new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                
+                img.onload = () => {
+                    this.cache.set(url, img);
+                    this.loadingPromises.delete(url);
+                    resolve(img);
+                };
+                
+                img.onerror = (error) => {
+                    this.loadingPromises.delete(url);
+                    reject(error);
+                };
+                
+                img.src = url;
+            });
+            
+            this.loadingPromises.set(url, promise);
+            return promise;
+        },
+        
+        // Get cached image or load
+        get: function(url) {
+            if (this.cache.has(url)) {
+                return Promise.resolve(this.cache.get(url));
+            }
+            return this.preload(url);
+        },
+        
+        // Preload images in viewport
+        preloadVisible: function() {
+            const visibleItems = Array.from(elements.imageItems).filter(item => {
+                const rect = item.getBoundingClientRect();
+                return rect.top < window.innerHeight + 200 && rect.bottom > -200;
+            });
+            
+            visibleItems.forEach(item => {
+                const imgSrc = item.getAttribute('data-src');
+                if (imgSrc && !this.cache.has(imgSrc)) {
+                    this.preload(imgSrc);
+                }
+            });
+        }
+    };
+    
+    // Setup optimized lazy loading with intersection observer
     function setupLazyLoading() {
         const lazyImages = document.querySelectorAll('.lazy-image');
         
@@ -70,8 +156,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (entry.isIntersecting) {
                         const img = entry.target;
                         const pictureElement = img.closest('picture');
+                        
                         if (pictureElement) {
-                            // Remove the placeholder once the image is loaded
+                            // Use optimized loading
+                            img.setAttribute('data-loaded', 'true');
+                            
                             const parent = img.closest('.image-item');
                             if (parent) {
                                 const placeholder = parent.querySelector('.image-placeholder');
@@ -79,9 +168,11 @@ document.addEventListener('DOMContentLoaded', function() {
                                     placeholder.style.opacity = '0';
                                     setTimeout(() => placeholder.remove(), 300);
                                 }
-                                setTimeout(() => {
+                                
+                                // Use requestAnimationFrame for smoother animation
+                                requestAnimationFrame(() => {
                                     parent.classList.add('loaded');
-                                }, 100);
+                                });
                             }
                         }
                         lazyImageObserver.unobserve(img);
@@ -96,34 +187,34 @@ document.addEventListener('DOMContentLoaded', function() {
                 lazyImageObserver.observe(img);
             });
         } else {
-            // Fallback for browsers without IntersectionObserver
+            // Fallback with performance optimization
             lazyImages.forEach(img => {
-                const pictureElement = img.closest('picture');
-                if (pictureElement) {
-                    const parent = img.closest('.image-item');
-                    if (parent) {
-                        const placeholder = parent.querySelector('.image-placeholder');
-                        if (placeholder) {
-                            placeholder.style.opacity = '0';
-                            setTimeout(() => placeholder.remove(), 300);
-                        }
-                        setTimeout(() => {
-                            parent.classList.add('loaded');
-                        }, 100);
+                img.setAttribute('data-loaded', 'true');
+                const parent = img.closest('.image-item');
+                if (parent) {
+                    const placeholder = parent.querySelector('.image-placeholder');
+                    if (placeholder) {
+                        placeholder.style.opacity = '0';
+                        setTimeout(() => placeholder.remove(), 300);
                     }
+                    requestAnimationFrame(() => {
+                        parent.classList.add('loaded');
+                    });
                 }
             });
         }
     }
     
-    // Animate sections
+    // Animate sections with performance optimization
     function setupSectionAnimation() {
         if ('IntersectionObserver' in window) {
             const sectionObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         const section = entry.target;
-                        section.classList.add('visible');
+                        requestAnimationFrame(() => {
+                            section.classList.add('visible');
+                        });
                     }
                 });
             }, {
@@ -141,35 +232,35 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Check if A-Frame scene is ready
+    // Optimized A-Frame scene checker with timeout
     function waitForAFrameScene() {
         return new Promise((resolve) => {
             const scene = document.querySelector('a-scene');
             if (scene && scene.hasLoaded) {
                 resolve();
-            } else {
-                const checkInterval = setInterval(() => {
-                    if (scene && scene.hasLoaded) {
-                        clearInterval(checkInterval);
-                        resolve();
-                    }
-                }, 100);
-                
-                // Fallback timeout
-                setTimeout(() => {
+                return;
+            }
+            
+            let attempts = 0;
+            const maxAttempts = 30; // 3 seconds max
+            
+            const checkInterval = setInterval(() => {
+                attempts++;
+                if ((scene && scene.hasLoaded) || attempts >= maxAttempts) {
                     clearInterval(checkInterval);
                     resolve();
-                }, 3000);
-            }
+                }
+            }, 100);
         });
     }
     
-    // Load 360° image with proper A-Frame initialization
-    function loadSkyTexture(imgSrc, mediaName, autoFullscreen = true) {
+    // Optimized 360° image loading with caching
+    function loadSkyTexture(imgSrc, mediaName) {
         if (state.isTransitioning) return;
         state.isTransitioning = true;
         state.skyImageLoaded = false;
         
+        // Show loading immediately
         elements.loadingMessage.style.display = 'block';
         elements.loadingMessage.style.opacity = '1';
         elements.loadingMessage.innerHTML = 'Loading 360° view...<div class="loading-spinner"></div>';
@@ -180,12 +271,9 @@ document.addEventListener('DOMContentLoaded', function() {
             elements.mainCamera.setAttribute('rotation', `${state.cameraRotation.x} ${state.cameraRotation.y} ${state.cameraRotation.z}`);
         }
         
-        // Wait for A-Frame scene to be ready, then load the image
-        waitForAFrameScene().then(() => {
-            const img = new Image();
-            img.crossOrigin = 'anonymous';
-            
-            img.onload = function() {
+        // Use cached image loading for faster performance
+        ImageLoader.get(imgSrc).then(img => {
+            return waitForAFrameScene().then(() => {
                 // Remove old image if it exists
                 const oldImage = document.getElementById('current-sky-image');
                 if (oldImage) {
@@ -201,8 +289,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Add to assets and update sky
                 elements.assets.appendChild(newImage);
                 
-                // Force A-Frame to recognize the new asset
-                setTimeout(() => {
+                // Force A-Frame to recognize the new asset with minimal delay
+                requestAnimationFrame(() => {
                     elements.mainSky.setAttribute('src', '#current-sky-image');
                     
                     // Force scene refresh if needed
@@ -211,11 +299,12 @@ document.addEventListener('DOMContentLoaded', function() {
                         scene.renderer.render(scene.object3D, scene.camera);
                     }
                     
-                    setTimeout(() => {
+                    // Faster hiding of loading message
+                    requestAnimationFrame(() => {
                         elements.loadingMessage.style.opacity = '0';
                         setTimeout(() => {
                             elements.loadingMessage.style.display = 'none';
-                        }, 500);
+                        }, 300);
                         
                         elements.currentMediaName.textContent = mediaName;
                         elements.mediaInfo.innerHTML = `Currently viewing: <strong>${mediaName}</strong>`;
@@ -229,42 +318,37 @@ document.addEventListener('DOMContentLoaded', function() {
                         state.skyImageLoaded = true;
                         state.isTransitioning = false;
                         
-                        // Force control panel to be visible after image loads
-                        setTimeout(() => {
+                        // Force control panel to be visible
+                        requestAnimationFrame(() => {
                             forceControlPanelVisible();
-                        }, 100);
+                        });
                         
                         if (!state.isVRMode && !state.isFullscreen) {
                             setTimeout(() => {
                                 showNotification('<i class="fas fa-info-circle"></i> Tip: Click VR button for enhanced experience, or fullscreen for immersive view', 5000);
                             }, 1000);
                         }
-                    }, 200);
-                }, 100);
-            };
+                    });
+                });
+            });
+        }).catch(error => {
+            console.error('Error loading 360° image:', imgSrc, error);
+            elements.loadingMessage.innerHTML = 'Error loading image. Please try another view.<div class="loading-spinner" style="border-top-color: #ff5252;"></div>';
             
-            img.onerror = function(e) {
-                console.error('Error loading 360° image:', imgSrc, e);
-                elements.loadingMessage.innerHTML = 'Error loading image. Please try another view.<div class="loading-spinner" style="border-top-color: #ff5252;"></div>';
-                
-                setTimeout(() => {
-                    elements.backToHome.click();
-                    state.isTransitioning = false;
-                }, 3000);
-            };
-            
-            img.src = imgSrc;
+            setTimeout(() => {
+                elements.backToHome.click();
+                state.isTransitioning = false;
+            }, 3000);
         });
     }
     
-    // Check WebXR support
+    // Optimized WebXR support check
     function checkWebXRSupport() {
         if ('xr' in navigator) {
             navigator.xr.isSessionSupported('immersive-vr').then((supported) => {
                 state.isWebXRSupported = supported;
                 console.log('WebXR VR support:', supported);
                 if (supported) {
-                    // Add VR indicator to button
                     elements.vrToggle.setAttribute('title', 'Click for VR headset mode');
                 }
             }).catch(() => {
@@ -279,7 +363,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Enhanced VR toggle function with WebXR support
     function toggleVRMode() {
-        // Only allow VR toggle when already in VR view
         if (!state.isInVRView) {
             showNotification('Please select an image first to enable VR mode');
             return;
@@ -289,11 +372,9 @@ document.addEventListener('DOMContentLoaded', function() {
             state.isVRMode = true;
             elements.vrToggle.classList.add('active');
             
-            // Try to enter WebXR VR mode for headsets
             if (state.isWebXRSupported && navigator.xr) {
                 const scene = document.querySelector('a-scene');
                 if (scene) {
-                    // A-Frame handles WebXR automatically, just trigger enter VR
                     scene.enterVR().then(() => {
                         showNotification('<i class="fas fa-vr-cardboard"></i> VR headset mode activated!');
                         enableAdvancedVRControls();
@@ -314,13 +395,11 @@ document.addEventListener('DOMContentLoaded', function() {
             state.isVRMode = false;
             elements.vrToggle.classList.remove('active');
             
-            // Exit VR mode
             const scene = document.querySelector('a-scene');
             if (scene && scene.is('vr-mode')) {
                 scene.exitVR();
             }
             
-            // Only exit fullscreen if we're actually in fullscreen
             if (document.fullscreenElement) {
                 exitFullscreenMode();
             }
@@ -334,7 +413,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function enableAdvancedVRControls() {
         const camera = elements.mainCamera;
         if (camera) {
-            // Enhanced controls for VR headsets
             camera.setAttribute('look-controls', {
                 'reverseMouseDrag': false,
                 'touchEnabled': true,
@@ -344,13 +422,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 'touchSensitivity': 0.8
             });
             
-            // Add hand tracking support if available
             camera.setAttribute('tracked-controls', 'controller: 0');
         }
         
-        // Enable hand controllers if available
         enableHandControllers();
-        
         showVRInstructions();
     }
 
@@ -358,14 +433,12 @@ document.addEventListener('DOMContentLoaded', function() {
     function enableHandControllers() {
         const scene = document.querySelector('a-scene');
         if (scene) {
-            // Add left hand controller
             const leftHand = document.createElement('a-entity');
             leftHand.setAttribute('id', 'leftHand');
             leftHand.setAttribute('laser-controls', 'hand: left');
             leftHand.setAttribute('raycaster', 'objects: .clickable');
             scene.appendChild(leftHand);
             
-            // Add right hand controller
             const rightHand = document.createElement('a-entity');
             rightHand.setAttribute('id', 'rightHand');
             rightHand.setAttribute('laser-controls', 'hand: right');
@@ -378,7 +451,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function enableWindowedVRControls() {
         const camera = elements.mainCamera;
         if (camera) {
-            // Enable enhanced look controls for mobile
             camera.setAttribute('look-controls', {
                 'reverseMouseDrag': false,
                 'touchEnabled': true,
@@ -389,34 +461,28 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         
-        // Add touch gesture support
         setupTouchControls();
-        
-        // Enable device orientation for mobile
         setupDeviceOrientation();
-        
         showVRInstructions();
     }
 
-    // Setup advanced touch controls for mobile
+    // Setup optimized touch controls for mobile
     function setupTouchControls() {
         const vrContainer = elements.vrContainer;
         
-        // Touch rotation controls
+        // Use passive event listeners for better performance
         vrContainer.addEventListener('touchstart', handleTouchStart, { passive: false });
         vrContainer.addEventListener('touchmove', handleTouchMove, { passive: false });
-        vrContainer.addEventListener('touchend', handleTouchEnd, { passive: false });
+        vrContainer.addEventListener('touchend', handleTouchEnd, { passive: true });
         
-        // Mouse controls for desktop
-        vrContainer.addEventListener('mousedown', handleMouseStart);
-        vrContainer.addEventListener('mousemove', handleMouseMove);
-        vrContainer.addEventListener('mouseup', handleMouseEnd);
+        vrContainer.addEventListener('mousedown', handleMouseStart, { passive: true });
+        vrContainer.addEventListener('mousemove', handleMouseMove, { passive: true });
+        vrContainer.addEventListener('mouseup', handleMouseEnd, { passive: true });
         
-        // Prevent context menu
         vrContainer.addEventListener('contextmenu', (e) => e.preventDefault());
     }
 
-    // Touch/Mouse event handlers
+    // Optimized touch/mouse event handlers
     function handleTouchStart(e) {
         if (e.touches.length === 1) {
             state.touchStartX = e.touches[0].clientX;
@@ -431,10 +497,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const deltaX = e.touches[0].clientX - state.touchStartX;
             const deltaY = e.touches[0].clientY - state.touchStartY;
             
-            // Horizontal rotation (left/right)
             state.cameraRotation.y = state.touchStartRotation.y + (deltaX * 0.5);
-            
-            // Vertical rotation (up/down)
             state.cameraRotation.x = Math.max(-80, Math.min(80, 
                 state.touchStartRotation.x - (deltaY * 0.3)
             ));
@@ -445,13 +508,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function handleTouchEnd(e) {
-        // Reset touch state
         state.touchStartX = 0;
         state.touchStartY = 0;
     }
 
     function handleMouseStart(e) {
-        if (e.button === 0) { // Left mouse button
+        if (e.button === 0) {
             state.isMouseDown = true;
             state.touchStartX = e.clientX;
             state.touchStartY = e.clientY;
@@ -465,10 +527,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const deltaX = e.clientX - state.touchStartX;
             const deltaY = e.clientY - state.touchStartY;
             
-            // Horizontal rotation
             state.cameraRotation.y = state.touchStartRotation.y + (deltaX * 0.3);
-            
-            // Vertical rotation
             state.cameraRotation.x = Math.max(-80, Math.min(80, 
                 state.touchStartRotation.x - (deltaY * 0.2)
             ));
@@ -487,19 +546,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // Setup device orientation for mobile VR
     function setupDeviceOrientation() {
         if (window.DeviceOrientationEvent) {
-            // Request permission for iOS 13+
             if (typeof DeviceOrientationEvent.requestPermission === 'function') {
                 DeviceOrientationEvent.requestPermission()
                     .then(permissionState => {
                         if (permissionState === 'granted') {
-                            window.addEventListener('deviceorientation', handleDeviceOrientation);
+                            window.addEventListener('deviceorientation', handleDeviceOrientation, { passive: true });
                             showNotification('<i class="fas fa-mobile-alt"></i> Device orientation enabled - Move your phone to look around!', 3000);
                         }
                     })
                     .catch(console.error);
             } else {
-                // Non-iOS devices
-                window.addEventListener('deviceorientation', handleDeviceOrientation);
+                window.addEventListener('deviceorientation', handleDeviceOrientation, { passive: true });
                 showNotification('<i class="fas fa-mobile-alt"></i> Device orientation enabled - Move your phone to look around!', 3000);
             }
         }
@@ -507,13 +564,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function handleDeviceOrientation(e) {
         if (state.skyImageLoaded && state.isVRMode) {
-            // Convert device orientation to camera rotation
-            // Note: This is a simplified implementation
-            const alpha = e.alpha || 0; // Z axis
-            const beta = e.beta || 0;   // X axis
-            const gamma = e.gamma || 0; // Y axis
+            const alpha = e.alpha || 0;
+            const beta = e.beta || 0;
+            const gamma = e.gamma || 0;
             
-            // Apply orientation to camera (adjust sensitivity as needed)
             state.cameraRotation.y = -alpha;
             state.cameraRotation.x = Math.max(-80, Math.min(80, beta - 90));
             
@@ -521,12 +575,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Update camera rotation
+    // Optimized camera rotation update
     function updateCameraRotation() {
         if (elements.mainCamera) {
-            elements.mainCamera.setAttribute('rotation', 
-                `${state.cameraRotation.x} ${state.cameraRotation.y} ${state.cameraRotation.z}`
-            );
+            requestAnimationFrame(() => {
+                elements.mainCamera.setAttribute('rotation', 
+                    `${state.cameraRotation.x} ${state.cameraRotation.y} ${state.cameraRotation.z}`
+                );
+            });
         }
     }
 
@@ -534,7 +590,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function disableVRControls() {
         const camera = elements.mainCamera;
         if (camera) {
-            // Reset to normal look controls
             camera.setAttribute('look-controls', {
                 'reverseMouseDrag': false,
                 'touchEnabled': true,
@@ -545,13 +600,11 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         
-        // Remove hand controllers
         const leftHand = document.getElementById('leftHand');
         const rightHand = document.getElementById('rightHand');
         if (leftHand) leftHand.remove();
         if (rightHand) rightHand.remove();
         
-        // Remove touch event listeners
         const vrContainer = elements.vrContainer;
         vrContainer.removeEventListener('touchstart', handleTouchStart);
         vrContainer.removeEventListener('touchmove', handleTouchMove);
@@ -578,7 +631,7 @@ document.addEventListener('DOMContentLoaded', function() {
         showNotification(instructions, 8000);
     }
 
-    // Fullscreen toggle function
+    // Optimized fullscreen toggle function
     function toggleFullscreen() {
         if (!state.isInVRView) {
             showNotification('Please select an image first');
@@ -601,28 +654,26 @@ document.addEventListener('DOMContentLoaded', function() {
     // Enter fullscreen mode
     function enterFullscreenMode() {
         const vrContainerElement = elements.vrContainer;
-        if (vrContainerElement.requestFullscreen) {
-            vrContainerElement.requestFullscreen();
-        } else if (vrContainerElement.mozRequestFullScreen) {
-            vrContainerElement.mozRequestFullScreen();
-        } else if (vrContainerElement.webkitRequestFullscreen) {
-            vrContainerElement.webkitRequestFullscreen();
-        } else if (vrContainerElement.msRequestFullscreen) {
-            vrContainerElement.msRequestFullscreen();
+        const requestFullscreen = vrContainerElement.requestFullscreen ||
+                                 vrContainerElement.mozRequestFullScreen ||
+                                 vrContainerElement.webkitRequestFullscreen ||
+                                 vrContainerElement.msRequestFullscreen;
+        
+        if (requestFullscreen) {
+            requestFullscreen.call(vrContainerElement);
         }
         showNotification('<i class="fas fa-expand"></i> Fullscreen mode enabled');
     }
     
     // Exit fullscreen mode
     function exitFullscreenMode() {
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
-        } else if (document.mozCancelFullScreen) {
-            document.mozCancelFullScreen();
-        } else if (document.webkitExitFullscreen) {
-            document.webkitExitFullscreen();
-        } else if (document.msExitFullscreen) {
-            document.msExitFullscreen();
+        const exitFullscreen = document.exitFullscreen ||
+                              document.mozCancelFullScreen ||
+                              document.webkitExitFullscreen ||
+                              document.msExitFullscreen;
+        
+        if (exitFullscreen) {
+            exitFullscreen.call(document);
         }
     }
     
@@ -634,7 +685,6 @@ document.addEventListener('DOMContentLoaded', function() {
                                         document.msFullscreenElement);
         
         if (!isCurrentlyFullscreen && state.isFullscreen) {
-            // User exited fullscreen (e.g., pressed Escape)
             state.isFullscreen = false;
             elements.fullscreenBtn.classList.remove('active');
             elements.fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i>';
@@ -642,12 +692,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Show notification
+    // Optimized notification system
     function showNotification(message, duration = 2000) {
         elements.mediaInfo.innerHTML = message;
         elements.mediaInfo.classList.add('visible');
         
-        setTimeout(() => {
+        clearTimeout(state.notificationTimeout);
+        state.notificationTimeout = setTimeout(() => {
             elements.mediaInfo.classList.remove('visible');
         }, duration);
     }
@@ -657,7 +708,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!state.skyImageLoaded || state.isTransitioning) return;
         
         state.cameraRotation.x = Math.max(state.cameraRotation.x - state.ROTATION_STEP, -80);
-        elements.mainCamera.setAttribute('rotation', `${state.cameraRotation.x} ${state.cameraRotation.y} ${state.cameraRotation.z}`);
+        updateCameraRotation();
         
         elements.lookUpBtn.style.transform = 'scale(0.9)';
         setTimeout(() => elements.lookUpBtn.style.transform = '', 200);
@@ -668,19 +719,18 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!state.skyImageLoaded || state.isTransitioning) return;
         
         state.cameraRotation.x = Math.min(state.cameraRotation.x + state.ROTATION_STEP, 80);
-        elements.mainCamera.setAttribute('rotation', `${state.cameraRotation.x} ${state.cameraRotation.y} ${state.cameraRotation.z}`);
+        updateCameraRotation();
         
         elements.lookDownBtn.style.transform = 'scale(0.9)';
         setTimeout(() => elements.lookDownBtn.style.transform = '', 200);
     }
     
-    // Handle image item click with improved A-Frame initialization
+    // Optimized image item click handling
     function setupImageItemClicks() {
         elements.imageItems.forEach(item => {
             item.addEventListener('click', function() {
                 if (state.isTransitioning) return;
                 
-                // Get the data-src from the image-item for the 360 view
                 const imgSrc = this.getAttribute('data-src');
                 if (!imgSrc || imgSrc === '') {
                     showNotification('<i class="fas fa-exclamation-triangle"></i> Image not available');
@@ -690,80 +740,63 @@ document.addEventListener('DOMContentLoaded', function() {
                 const mediaName = this.querySelector('.image-caption').textContent;
                 const category = this.getAttribute('data-category');
                 
-                elements.homePage.style.opacity = '0';
-                
-                setTimeout(() => {
-                    elements.homePage.style.display = 'none';
-                    elements.vrContainer.style.display = 'block';
-                    elements.backToHome.style.display = 'block';
+                // Preload the image before transitioning
+                ImageLoader.preload(imgSrc).then(() => {
+                    elements.homePage.style.opacity = '0';
                     
-                    // Force control panel to be visible
-                    elements.controlPanel.style.display = 'flex';
-                    elements.controlPanel.style.opacity = '1';
-                    elements.controlPanel.style.visibility = 'visible';
-                    elements.controlPanel.classList.add('visible');
-                    elements.controlPanel.classList.add('show');
-                    
-                    elements.vrNavControls.style.display = 'flex';
-                    
-                    state.currentCategory = category;
-                    state.isInVRView = true; // Set VR view state
-                    const categoryItems = Array.from(document.querySelectorAll(`.image-item[data-category="${category}"]`));
-                    state.currentMediaIndex = categoryItems.indexOf(this);
-                    
-                    // Give A-Frame more time to initialize the scene when it becomes visible
                     setTimeout(() => {
-                        // Force A-Frame scene to resize and refresh
-                        const scene = document.querySelector('a-scene');
-                        if (scene) {
-                            // Trigger resize to ensure proper initialization
-                            window.dispatchEvent(new Event('resize'));
-                            
-                            // Wait a bit more for the scene to be ready
-                            setTimeout(() => {
-                                loadSkyTexture(imgSrc, mediaName);
+                        elements.homePage.style.display = 'none';
+                        elements.vrContainer.style.display = 'block';
+                        elements.backToHome.style.display = 'block';
+                        
+                        forceControlPanelVisible();
+                        elements.vrNavControls.style.display = 'flex';
+                        
+                        state.currentCategory = category;
+                        state.isInVRView = true;
+                        const categoryItems = Array.from(document.querySelectorAll(`.image-item[data-category="${category}"]`));
+                        state.currentMediaIndex = categoryItems.indexOf(this);
+                        
+                        setTimeout(() => {
+                            const scene = document.querySelector('a-scene');
+                            if (scene) {
+                                window.dispatchEvent(new Event('resize'));
                                 
-                                // Force control panel visibility after loading
                                 setTimeout(() => {
-                                    console.log('Forcing control panel visibility...');
-                                    elements.controlPanel.style.display = 'flex';
-                                    elements.controlPanel.style.opacity = '1';
-                                    elements.controlPanel.style.visibility = 'visible';
-                                    elements.controlPanel.style.position = 'fixed';
-                                    elements.controlPanel.style.bottom = '20px';
-                                    elements.controlPanel.style.left = '50%';
-                                    elements.controlPanel.style.transform = 'translateX(-50%)';
-                                    elements.controlPanel.style.zIndex = '9999';
+                                    loadSkyTexture(imgSrc, mediaName);
                                     
-                                    // Also ensure buttons are visible
-                                    [elements.prevBtn, elements.nextBtn, elements.vrToggle, elements.fullscreenBtn].forEach(btn => {
-                                        if (btn) {
-                                            btn.style.display = 'flex';
-                                            btn.style.opacity = '1';
-                                            btn.style.visibility = 'visible';
-                                        }
-                                    });
-                                    
-                                    console.log('Control panel forced visible:', elements.controlPanel.style.display);
-                                }, 500);
-                            }, 300);
-                        } else {
-                            loadSkyTexture(imgSrc, mediaName);
-                        }
-                    }, 200);
-                }, 500);
+                                    setTimeout(() => {
+                                        forceControlPanelVisible();
+                                    }, 300);
+                                }, 200);
+                            } else {
+                                loadSkyTexture(imgSrc, mediaName);
+                            }
+                        }, 100);
+                    }, 400);
+                }).catch(error => {
+                    console.error('Failed to preload image:', error);
+                    showNotification('<i class="fas fa-exclamation-triangle"></i> Failed to load image');
+                });
             });
         });
     }
     
-    // Back to home function
+    // Optimized back to home function with cancel support
     function backToHomePage() {
-        if (state.isTransitioning) return;
+        // Allow back to home even during transition by cancelling ongoing loading
+        if (state.isTransitioning) {
+            console.log('Cancelling ongoing transition to return home...');
+            // Reset transition state immediately
+            state.isTransitioning = false;
+            // Clear loading queue and promises if any
+            ImageLoader.loadingPromises.clear();
+            ImageLoader.cache.clear();
+        }
         state.isTransitioning = true;
         
         console.log('Returning to home page...');
         
-        // Reset all VR states
         if (state.isVRMode) {
             state.isVRMode = false;
             elements.vrToggle.classList.remove('active');
@@ -779,40 +812,32 @@ document.addEventListener('DOMContentLoaded', function() {
         
         elements.vrContainer.style.opacity = '0';
         elements.backToHome.style.opacity = '0';
-        
-        // Hide control panel
         elements.controlPanel.style.opacity = '0';
         elements.controlPanel.style.visibility = 'hidden';
-        elements.controlPanel.classList.remove('visible');
-        elements.controlPanel.classList.remove('show');
-        
         elements.vrNavControls.style.opacity = '0';
         
         setTimeout(() => {
             elements.homePage.style.display = 'block';
             elements.vrContainer.style.display = 'none';
             elements.backToHome.style.display = 'none';
-            
-            // Ensure control panel is hidden
             elements.controlPanel.style.display = 'none';
-            
             elements.vrNavControls.style.display = 'none';
             elements.mediaInfo.classList.remove('visible');
             elements.loadingMessage.style.display = 'none';
             
-            state.isInVRView = false; // Reset VR view state
+            state.isInVRView = false;
             
-            setTimeout(() => {
+            requestAnimationFrame(() => {
                 elements.homePage.style.opacity = '1';
                 elements.vrContainer.style.opacity = '1';
                 elements.backToHome.style.opacity = '1';
                 elements.vrNavControls.style.opacity = '1';
                 state.isTransitioning = false;
-            }, 50);
+            });
         }, 300);
     }
     
-    // Show home page function
+    // Optimized show home page function
     function showHomePage() {
         console.log('Showing home page...');
         
@@ -823,21 +848,31 @@ document.addEventListener('DOMContentLoaded', function() {
             elements.welcomeScreen.style.display = 'none';
             elements.homePage.style.display = 'block';
             
-            setTimeout(() => {
+            requestAnimationFrame(() => {
                 elements.homePage.style.opacity = '1';
                 setupSectionAnimation();
                 setupLazyLoading();
+                
+                // Preload visible images
+                setTimeout(() => {
+                    ImageLoader.preloadVisible();
+                }, 1000);
+                
                 console.log('Home page displayed successfully');
-            }, 50);
-        }, 800);
+            });
+        }, 600);
     }
-    
-    // Navigation controls setup with enhanced functionality
+    // Navigation controls setup with optimizations
     function setupNavigationControls() {
-        // Previous button with enhanced feedback
+        // Previous button with debouncing
         if (elements.prevBtn) {
+            let prevBtnTimeout;
             elements.prevBtn.addEventListener('click', function() {
-                if (!state.skyImageLoaded || state.isTransitioning) return;
+                if (!state.skyImageLoaded || state.isTransitioning || prevBtnTimeout) return;
+                
+                prevBtnTimeout = setTimeout(() => {
+                    prevBtnTimeout = null;
+                }, 300);
                 
                 this.style.transform = 'scale(0.85)';
                 setTimeout(() => {
@@ -852,26 +887,30 @@ document.addEventListener('DOMContentLoaded', function() {
                     const imgSrc = prevImage.getAttribute('data-src');
                     const mediaName = prevImage.querySelector('.image-caption').textContent;
                     
-                    loadSkyTexture(imgSrc, mediaName);
-                    
-                    // Update button states
-                    updateNavigationButtonStates(categoryItems.length);
+                    // Preload before loading
+                    ImageLoader.preload(imgSrc).then(() => {
+                        loadSkyTexture(imgSrc, mediaName);
+                        updateNavigationButtonStates(categoryItems.length);
+                    });
                 } else {
                     this.classList.add('disabled');
-                    
                     setTimeout(() => {
                         this.classList.remove('disabled');
                     }, 1000);
-                    
                     showNotification('<i class="fas fa-info-circle"></i> First item in this category');
                 }
             });
         }
         
-        // Next button with enhanced feedback
+        // Next button with debouncing
         if (elements.nextBtn) {
+            let nextBtnTimeout;
             elements.nextBtn.addEventListener('click', function() {
-                if (!state.skyImageLoaded || state.isTransitioning) return;
+                if (!state.skyImageLoaded || state.isTransitioning || nextBtnTimeout) return;
+                
+                nextBtnTimeout = setTimeout(() => {
+                    nextBtnTimeout = null;
+                }, 300);
                 
                 this.style.transform = 'scale(0.85)';
                 setTimeout(() => {
@@ -886,23 +925,22 @@ document.addEventListener('DOMContentLoaded', function() {
                     const imgSrc = nextImage.getAttribute('data-src');
                     const mediaName = nextImage.querySelector('.image-caption').textContent;
                     
-                    loadSkyTexture(imgSrc, mediaName);
-                    
-                    // Update button states
-                    updateNavigationButtonStates(categoryItems.length);
+                    // Preload before loading
+                    ImageLoader.preload(imgSrc).then(() => {
+                        loadSkyTexture(imgSrc, mediaName);
+                        updateNavigationButtonStates(categoryItems.length);
+                    });
                 } else {
                     this.classList.add('disabled');
-                    
                     setTimeout(() => {
                         this.classList.remove('disabled');
                     }, 1000);
-                    
                     showNotification('<i class="fas fa-info-circle"></i> Last item in this category');
                 }
             });
         }
         
-        // VR toggle button with enhanced functionality
+        // VR toggle button
         if (elements.vrToggle) {
             elements.vrToggle.addEventListener('click', function() {
                 this.style.transform = 'scale(0.85)';
@@ -943,7 +981,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         
-        // Setup horizontal controls for mobile
         setupMobileControls();
     }
 
@@ -981,7 +1018,6 @@ document.addEventListener('DOMContentLoaded', function() {
             recenterBtn.addEventListener('click', function() {
                 if (!state.skyImageLoaded || state.isTransitioning) return;
                 
-                // Reset camera to default position
                 state.cameraRotation = { x: 0, y: -90, z: 0 };
                 updateCameraRotation();
                 
@@ -996,34 +1032,32 @@ document.addEventListener('DOMContentLoaded', function() {
     // Update navigation button states
     function updateNavigationButtonStates(totalItems) {
         if (elements.prevBtn && elements.nextBtn) {
-            // Update previous button
-            if (state.currentMediaIndex <= 0) {
-                elements.prevBtn.style.opacity = '0.5';
-            } else {
-                elements.prevBtn.style.opacity = '1';
-            }
-            
-            // Update next button
-            if (state.currentMediaIndex >= totalItems - 1) {
-                elements.nextBtn.style.opacity = '0.5';
-            } else {
-                elements.nextBtn.style.opacity = '1';
-            }
+            elements.prevBtn.style.opacity = state.currentMediaIndex <= 0 ? '0.5' : '1';
+            elements.nextBtn.style.opacity = state.currentMediaIndex >= totalItems - 1 ? '0.5' : '1';
         }
     }
     
-    // Back to top visibility
+    // Optimized scroll handling with throttling
     function setupScrollHandling() {
-        window.addEventListener('scroll', throttle(function() {
-            if (window.scrollY > 300) {
-                elements.backToTop.classList.add('visible');
-            } else {
-                elements.backToTop.classList.remove('visible');
-            }
-            updateActiveNavItem();
-        }, 100));
+        let scrollTimeout;
+        window.addEventListener('scroll', function() {
+            if (scrollTimeout) return;
+            
+            scrollTimeout = setTimeout(() => {
+                if (window.scrollY > 300) {
+                    elements.backToTop.classList.add('visible');
+                } else {
+                    elements.backToTop.classList.remove('visible');
+                }
+                updateActiveNavItem();
+                
+                // Preload visible images on scroll
+                ImageLoader.preloadVisible();
+                
+                scrollTimeout = null;
+            }, 16); // ~60fps
+        }, { passive: true });
         
-        // Back to top functionality
         if (elements.backToTop) {
             elements.backToTop.addEventListener('click', function() {
                 window.scrollTo({
@@ -1032,9 +1066,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             });
         }
-    }
+        }
     
-    // Update active navigation
+    // Optimized active navigation update
     function updateActiveNavItem() {
         let current = '';
         let minDistance = Infinity;
@@ -1068,7 +1102,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Navigation links setup
+    // Navigation links setup with performance optimization
     function setupNavigationLinks() {
         elements.navItems.forEach(item => {
             item.addEventListener('click', function(e) {
@@ -1081,16 +1115,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 const targetSection = document.querySelector(targetId);
                 
                 if (targetSection) {
+                    const targetPosition = targetSection.offsetTop - 180;
                     window.scrollTo({
-                        top: targetSection.offsetTop - 180,
+                        top: targetPosition,
                         behavior: 'smooth'
                     });
+                    
+                    // Preload images in target section
+                    setTimeout(() => {
+                        const sectionImages = targetSection.querySelectorAll('.image-item[data-src]');
+                        sectionImages.forEach(item => {
+                            const imgSrc = item.getAttribute('data-src');
+                            if (imgSrc) {
+                                ImageLoader.preload(imgSrc);
+                            }
+                        });
+                    }, 500);
                 }
             });
         });
     }
     
-    // Department tabs setup
+    // Department tabs setup with lazy loading
     function setupDepartmentTabs() {
         const departmentTabs = document.querySelectorAll('.sub-nav-item');
         const departmentContents = document.querySelectorAll('.department-content');
@@ -1110,53 +1156,63 @@ document.addEventListener('DOMContentLoaded', function() {
                 const targetContent = document.getElementById(targetId);
                 if (targetContent) {
                     targetContent.classList.add('active');
+                    
+                    // Preload images in the active department
+                    setTimeout(() => {
+                        const deptImages = targetContent.querySelectorAll('.image-item[data-src]');
+                        deptImages.forEach(item => {
+                            const imgSrc = item.getAttribute('data-src');
+                            if (imgSrc) {
+                                ImageLoader.preload(imgSrc);
+                            }
+                        });
+                    }, 300);
                 }
             });
         });
     }
     
-    // Keyboard support
+    // Optimized keyboard support with event delegation
     function setupKeyboardControls() {
-        document.addEventListener('keydown', function(e) {
+        const keyHandler = function(e) {
             if (elements.vrContainer.style.display === 'block' && state.skyImageLoaded && !state.isTransitioning) {
                 switch(e.key) {
                     case 'ArrowLeft':
+                        e.preventDefault();
                         elements.prevBtn.click();
                         break;
                     case 'ArrowRight':
+                        e.preventDefault();
                         elements.nextBtn.click();
                         break;
                     case 'ArrowUp':
+                        e.preventDefault();
                         lookUp();
                         break;
                     case 'ArrowDown':
+                        e.preventDefault();
                         lookDown();
                         break;
                     case 'a':
                     case 'A':
-                        // Look left
                         state.cameraRotation.y -= state.ROTATION_STEP;
                         updateCameraRotation();
                         break;
                     case 'd':
                     case 'D':
-                        // Look right
                         state.cameraRotation.y += state.ROTATION_STEP;
                         updateCameraRotation();
                         break;
                     case 'w':
                     case 'W':
-                        // Look up
                         lookUp();
                         break;
                     case 's':
                     case 'S':
-                        // Look down
                         lookDown();
                         break;
                     case 'r':
                     case 'R':
-                        // Recenter view
                         state.cameraRotation = { x: 0, y: -90, z: 0 };
                         updateCameraRotation();
                         showNotification('<i class="fas fa-crosshairs"></i> View recentered');
@@ -1174,15 +1230,17 @@ document.addEventListener('DOMContentLoaded', function() {
                         break;
                 }
             }
-        });
+        };
+        
+        document.addEventListener('keydown', keyHandler, { passive: false });
     }
     
     // Setup fullscreen change event listeners
     function setupFullscreenEvents() {
-        document.addEventListener('fullscreenchange', handleFullscreenChange);
-        document.addEventListener('mozfullscreenchange', handleFullscreenChange);
-        document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-        document.addEventListener('msfullscreenchange', handleFullscreenChange);
+        const events = ['fullscreenchange', 'mozfullscreenchange', 'webkitfullscreenchange', 'msfullscreenchange'];
+        events.forEach(event => {
+            document.addEventListener(event, handleFullscreenChange, { passive: true });
+        });
     }
 
     // Show mobile VR hint
@@ -1195,7 +1253,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     hint.style.opacity = '1';
                 }, 100);
                 
-                // Hide after 5 seconds
                 setTimeout(() => {
                     hint.style.opacity = '0';
                     setTimeout(() => {
@@ -1210,7 +1267,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function setupVRModeIndicator() {
         const indicator = document.getElementById('vr-mode-indicator');
         if (indicator) {
-            // Show/hide based on VR mode state
             if (state.isVRMode) {
                 indicator.style.display = 'flex';
                 setTimeout(() => {
@@ -1225,40 +1281,22 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Debug function to check element visibility
-    function debugControlPanel() {
-        console.log('=== Control Panel Debug ===');
-        console.log('Control Panel Element:', elements.controlPanel);
-        console.log('Control Panel Display:', elements.controlPanel ? elements.controlPanel.style.display : 'NOT FOUND');
-        console.log('Control Panel Opacity:', elements.controlPanel ? elements.controlPanel.style.opacity : 'NOT FOUND');
-        console.log('Control Panel Classes:', elements.controlPanel ? elements.controlPanel.className : 'NOT FOUND');
-        console.log('Prev Button:', elements.prevBtn);
-        console.log('Next Button:', elements.nextBtn);
-        console.log('VR Toggle:', elements.vrToggle);
-        console.log('Fullscreen Button:', elements.fullscreenBtn);
-        console.log('VR Container Display:', elements.vrContainer ? elements.vrContainer.style.display : 'NOT FOUND');
-        console.log('=== End Debug ===');
-    }
-
-    // Force control panel visibility function
+    // Optimized control panel visibility
     function forceControlPanelVisible() {
         if (elements.controlPanel) {
-            elements.controlPanel.style.display = 'flex';
-            elements.controlPanel.style.opacity = '1';
-            elements.controlPanel.style.visibility = 'visible';
-            elements.controlPanel.style.position = 'fixed';
-            elements.controlPanel.style.bottom = '20px';
-            elements.controlPanel.style.left = '50%';
-            elements.controlPanel.style.transform = 'translateX(-50%)';
-            elements.controlPanel.style.zIndex = '9999';
-            elements.controlPanel.style.background = 'rgba(255, 255, 255, 0.95)';
-            elements.controlPanel.style.padding = '10px 20px';
-            elements.controlPanel.style.borderRadius = '50px';
-            elements.controlPanel.style.gap = '15px';
-            elements.controlPanel.classList.add('visible', 'show');
-            
-            console.log('Control panel forced visible');
-            debugControlPanel();
+            requestAnimationFrame(() => {
+                elements.controlPanel.style.display = 'flex';
+                elements.controlPanel.style.opacity = '1';
+                elements.controlPanel.style.visibility = 'visible';
+                elements.controlPanel.style.position = 'fixed';
+                elements.controlPanel.style.bottom = '20px';
+                elements.controlPanel.style.left = '50%';
+                elements.controlPanel.style.transform = 'translateX(-50%)';
+                elements.controlPanel.style.zIndex = '9999';
+                elements.controlPanel.classList.add('visible', 'show');
+                
+                console.log('Control panel forced visible');
+            });
         } else {
             console.error('Control panel element not found!');
         }
@@ -1268,7 +1306,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function throttle(callback, delay) {
         let lastCall = 0;
         return function(...args) {
-            const now = new Date().getTime();
+            const now = Date.now();
             if (now - lastCall < delay) {
                 return;
             }
@@ -1277,33 +1315,43 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
     
-    // Initialize everything
+    // Performance optimization - debounce function
+    function debounce(callback, delay) {
+        let timeoutId;
+        return function(...args) {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => callback.apply(this, args), delay);
+        };
+    }
+    
+    // Initialize everything with performance optimizations
     function initialize() {
         console.log('Initializing application...');
         
         // Check for WebXR support
         checkWebXRSupport();
         
-        // Setup A-Frame scene loading event
+        // Preload critical images immediately
+        ImageLoader.preloadCritical();
+        
+        // Setup A-Frame scene loading event with performance optimization
         const scene = document.querySelector('a-scene');
         if (scene) {
             scene.addEventListener('loaded', function() {
                 console.log('A-Frame scene loaded and ready');
-            });
+            }, { once: true });
             
-            // Also listen for when assets are loaded
             scene.addEventListener('materialized', function() {
                 console.log('A-Frame scene materialized');
-            });
+            }, { once: true });
             
-            // Add VR mode change listeners
             scene.addEventListener('enter-vr', function() {
                 console.log('Entered VR mode');
                 state.isVRMode = true;
                 elements.vrToggle.classList.add('active');
                 setupVRModeIndicator();
                 showNotification('<i class="fas fa-vr-cardboard"></i> VR headset mode active!');
-            });
+            }, { passive: true });
             
             scene.addEventListener('exit-vr', function() {
                 console.log('Exited VR mode');
@@ -1311,21 +1359,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 elements.vrToggle.classList.remove('active');
                 setupVRModeIndicator();
                 showNotification('<i class="fas fa-desktop"></i> Returned to desktop mode');
-            });
+            }, { passive: true });
         }
         
-        // Setup event listeners
-        
-        // Welcome screen - Enter button (Fixed)
+        // Setup event listeners with performance optimizations
         if (elements.enterButton) {
             console.log('Setting up enter button event listener...');
             elements.enterButton.addEventListener('click', function(e) {
                 console.log('Enter button clicked!');
                 e.preventDefault();
                 showHomePage();
-            });
+            }, { once: true });
             
-            // Also add a backup event listener with a slight delay
+            // Backup event listener
             setTimeout(() => {
                 if (elements.enterButton && !elements.enterButton.hasAttribute('data-listener-added')) {
                     elements.enterButton.setAttribute('data-listener-added', 'true');
@@ -1342,13 +1388,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Back to home button
         if (elements.backToHome) {
-            elements.backToHome.addEventListener('click', backToHomePage);
-        }
-        
-        // Setup mobile VR hint element
-        const mobileHint = document.getElementById('mobile-vr-hint');
-        if (mobileHint && 'ontouchstart' in window) {
-            console.log('Mobile device detected - VR hints enabled');
+            elements.backToHome.addEventListener('click', backToHomePage, { passive: true });
         }
         
         // Setup all other components
@@ -1360,32 +1400,35 @@ document.addEventListener('DOMContentLoaded', function() {
         setupKeyboardControls();
         setupFullscreenEvents();
         
-        // Debug control panel on initialization
-        console.log('Initializing - checking control panel...');
-        debugControlPanel();
-        
-        // Set up a global click handler to debug when images are clicked
-        document.addEventListener('click', function(e) {
-            if (e.target.closest('.image-item')) {
-                console.log('Image item clicked, should show control panel...');
-                setTimeout(() => {
-                    debugControlPanel();
-                    forceControlPanelVisible();
-                }, 1000);
-            }
+        // Visibility optimization on scroll
+        const visibilityObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const imgSrc = entry.target.getAttribute('data-src');
+                    if (imgSrc) {
+                        ImageLoader.preload(imgSrc);
+                    }
+                }
+            });
+        }, {
+            rootMargin: '200px 0px',
+            threshold: 0.01
         });
         
-        // Error handling for A-Frame
+        elements.imageItems.forEach(item => {
+            visibilityObserver.observe(item);
+        });
+        
+        // Error handling for A-Frame with better recovery
         window.addEventListener('error', function(e) {
             if (e.message && e.message.includes('A-Frame')) {
                 console.warn('A-Frame error caught:', e.message);
                 // Continue execution despite A-Frame warnings
             }
-        });
+        }, { passive: true });
 
-        // Ensure proper cleanup on page unload
+        // Cleanup on page unload
         window.addEventListener('beforeunload', function() {
-            // Exit VR mode if active
             if (state.isVRMode) {
                 const scene = document.querySelector('a-scene');
                 if (scene && scene.exitVR) {
@@ -1393,29 +1436,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
             
-            // Exit fullscreen if active
             if (state.isFullscreen && document.exitFullscreen) {
                 document.exitFullscreen();
             }
-        });
+        }, { passive: true });
 
         // Performance optimization for mobile
         if ('ontouchstart' in window) {
-            // Reduce texture quality for better performance
             const scene = document.querySelector('a-scene');
             if (scene) {
                 scene.setAttribute('renderer', {
                     antialias: false,
                     maxCanvasWidth: 1920,
                     maxCanvasHeight: 1920,
-                    powerPreference: 'high-performance'
+                    powerPreference: 'high-performance',
+                    precision: 'mediump'
                 });
             }
         }
         
         console.log('Application initialized successfully!');
         
-        // Show initial instructions
+        // Show initial instructions with device detection
         setTimeout(() => {
             if (window.DeviceOrientationEvent && 'ontouchstart' in window) {
                 showNotification('<i class="fas fa-mobile-alt"></i> Mobile VR ready! Click any image to start your 360° journey', 4000);
@@ -1423,19 +1465,57 @@ document.addEventListener('DOMContentLoaded', function() {
                 showNotification('<i class="fas fa-vr-cardboard"></i> VR headset detected! Click any image to start your immersive tour', 4000);
             }
         }, 2000);
+        
+        // Additional performance optimizations
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(() => {
+                // Preload additional images during idle time
+                const allImages = Array.from(elements.imageItems).slice(4, 12);
+                allImages.forEach(item => {
+                    const imgSrc = item.getAttribute('data-src');
+                    if (imgSrc) {
+                        ImageLoader.preload(imgSrc);
+                    }
+                });
+            });
+        }
     }
     
-    // Start the application
+    // Start the application with performance monitoring
+    console.time('App Initialization');
     initialize();
+    console.timeEnd('App Initialization');
 });
 
 // Additional safety measure - if DOM is already loaded
 if (document.readyState === 'loading') {
-    // DOM is still loading, wait for DOMContentLoaded
     console.log('DOM is still loading...');
 } else {
-    // DOM is already loaded
     console.log('DOM already loaded, running initialization...');
-    // Trigger DOMContentLoaded event manually
     window.dispatchEvent(new Event('DOMContentLoaded'));
 }
+
+// Service Worker registration for caching (optional performance boost)
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+        // Register service worker for caching if available
+        // This would require a separate service-worker.js file
+        console.log('Service Worker support detected');
+    });
+}
+
+// WebP detection for better image format support
+function detectWebPSupport() {
+    const webP = new Image();
+    webP.onload = webP.onerror = function () {
+        if (webP.height === 2) {
+            document.documentElement.classList.add('webp');
+        } else {
+            document.documentElement.classList.add('no-webp');
+        }
+    };
+    webP.src = 'data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAACyAgCdASoCAAIALmk0mk0iIiIiIgBoSygABc6WWgAA/veff/0PP8bA//LwYAAA';
+}
+
+// Run WebP detection
+detectWebPSupport();
