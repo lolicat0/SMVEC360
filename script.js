@@ -470,10 +470,47 @@ document.addEventListener('DOMContentLoaded', function() {
     function setupTouchControls() {
         const vrContainer = elements.vrContainer;
         
+        // Variables for swipe detection
+        let swipeStartX = 0;
+        let swipeStartY = 0;
+        let swipeEndX = 0;
+        let swipeEndY = 0;
+        const swipeThreshold = 100; // Minimum distance in px for swipe
+        
         // Use passive event listeners for better performance
-        vrContainer.addEventListener('touchstart', handleTouchStart, { passive: false });
-        vrContainer.addEventListener('touchmove', handleTouchMove, { passive: false });
-        vrContainer.addEventListener('touchend', handleTouchEnd, { passive: true });
+        vrContainer.addEventListener('touchstart', function(e) {
+            if (e.touches.length === 1) {
+                swipeStartX = e.touches[0].clientX;
+                swipeStartY = e.touches[0].clientY;
+            }
+            handleTouchStart(e);
+        }, { passive: false });
+        
+        vrContainer.addEventListener('touchmove', function(e) {
+            if (e.touches.length === 1) {
+                swipeEndX = e.touches[0].clientX;
+                swipeEndY = e.touches[0].clientY;
+            }
+            handleTouchMove(e);
+        }, { passive: false });
+        
+        vrContainer.addEventListener('touchend', function(e) {
+            const deltaX = swipeEndX - swipeStartX;
+            const deltaY = swipeEndY - swipeStartY;
+            
+            // Detect horizontal swipe right with minimal vertical movement
+            if (deltaX > swipeThreshold && Math.abs(deltaY) < 50) {
+                // Trigger back to home page on swipe right
+                backToHomePage();
+            }
+            
+            swipeStartX = 0;
+            swipeStartY = 0;
+            swipeEndX = 0;
+            swipeEndY = 0;
+            
+            handleTouchEnd(e);
+        }, { passive: true });
         
         vrContainer.addEventListener('mousedown', handleMouseStart, { passive: true });
         vrContainer.addEventListener('mousemove', handleMouseMove, { passive: true });
