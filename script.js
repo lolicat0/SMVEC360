@@ -73,25 +73,25 @@ document.addEventListener('DOMContentLoaded', function() {
         loadingQueue: []
     };
     
-    // Image preloading and caching system
+    // Image preloading and caching system - optimized for on-demand loading
     const ImageLoader = {
         cache: new Map(),
         loadingPromises: new Map(),
+        priorityQueue: [],
+        isProcessingQueue: false,
         
-        // Preload critical images
+        // Only preload essential UI images (not 360° images)
         preloadCritical: function() {
+            // Only preload the default skybox placeholder - no 360° images
             const criticalImages = [
-                'https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_1024/v1743753190/20250404_131710_587_formphotoeditor.com_wjfmhk.jpg',
-                'https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315076/entrance_jgbfdn.jpg',
-                'https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315079/kovil_xj0psx.jpg',
-                'https://res.cloudinary.com/dugxrvrs5/image/upload/v1750315074/central_library_oxukdy.jpg'
+                'https://res.cloudinary.com/dugxrvrs5/image/upload/f_auto,q_auto,w_1024/v1743753190/20250404_131710_587_formphotoeditor.com_wjfmhk.jpg'
             ];
             
             criticalImages.forEach(url => this.preload(url));
         },
         
-        // Preload image with promise caching
-        preload: function(url) {
+        // Load image with priority support
+        preload: function(url, priority = false) {
             if (this.cache.has(url)) {
                 return Promise.resolve(this.cache.get(url));
             }
@@ -119,28 +119,79 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             
             this.loadingPromises.set(url, promise);
-            return promise;
+            
+            // If priority, load immediately, otherwise add to queue
+            if (priority) {
+                return promise;
+            } else {
+                this.priorityQueue.push({ url, promise });
+                this.processQueue();
+                return promise;
+            }
         },
         
-        // Get cached image or load
-        get: function(url) {
+        // Process loading queue sequentially to avoid bandwidth overload
+        processQueue: function() {
+            if (this.isProcessingQueue || this.priorityQueue.length === 0) {
+                return;
+            }
+            
+            this.isProcessingQueue = true;
+            const { url, promise } = this.priorityQueue.shift();
+            
+            promise.finally(() => {
+                this.isProcessingQueue = false;
+                // Process next item after a small delay to prevent overwhelming
+                setTimeout(() => this.processQueue(), 100);
+            });
+        },
+        
+        // Load image with high priority (for clicked images)
+        loadWithPriority: function(url) {
+            return this.preload(url, true);
+        },
+        
+        // Get cached image or load with priority
+        get: function(url, priority = false) {
             if (this.cache.has(url)) {
                 return Promise.resolve(this.cache.get(url));
             }
-            return this.preload(url);
+            return priority ? this.loadWithPriority(url) : this.preload(url);
         },
         
-        // Preload images in viewport
+        // Only preload thumbnail images in viewport (not 360° images)
         preloadVisible: function() {
-            const visibleItems = Array.from(elements.imageItems).filter(item => {
-                const rect = item.getBoundingClientRect();
+            // Only preload thumbnail images, not the 360° source images
+            const visibleThumbnails = Array.from(document.querySelectorAll('.lazy-image')).filter(img => {
+                const rect = img.getBoundingClientRect();
                 return rect.top < window.innerHeight + 200 && rect.bottom > -200;
             });
             
-            visibleItems.forEach(item => {
-                const imgSrc = item.getAttribute('data-src');
+            // Don't preload 360° images automatically
+            // Only preload if it's a thumbnail image (has lazy-image class)
+            visibleThumbnails.forEach(img => {
+                const imgSrc = img.src;
                 if (imgSrc && !this.cache.has(imgSrc)) {
                     this.preload(imgSrc);
+                }
+            });
+        },
+        
+        // Preload adjacent images for smooth navigation
+        preloadAdjacent: function(currentIndex, category) {
+            const categoryItems = Array.from(document.querySelectorAll(`.image-item[data-category="${category}"]`));
+            
+            // Preload previous and next images only
+            const adjacentIndices = [currentIndex - 1, currentIndex + 1].filter(
+                index => index >= 0 && index < categoryItems.length
+            );
+            
+            adjacentIndices.forEach(index => {
+                const item = categoryItems[index];
+                const imgSrc = item.getAttribute('data-src');
+                if (imgSrc && !this.cache.has(imgSrc)) {
+                    // Add to queue with lower priority
+                    this.preload(imgSrc, false);
                 }
             });
         }
@@ -470,47 +521,10 @@ document.addEventListener('DOMContentLoaded', function() {
     function setupTouchControls() {
         const vrContainer = elements.vrContainer;
         
-        // Variables for swipe detection
-        let swipeStartX = 0;
-        let swipeStartY = 0;
-        let swipeEndX = 0;
-        let swipeEndY = 0;
-        const swipeThreshold = 100; // Minimum distance in px for swipe
-        
         // Use passive event listeners for better performance
-        vrContainer.addEventListener('touchstart', function(e) {
-            if (e.touches.length === 1) {
-                swipeStartX = e.touches[0].clientX;
-                swipeStartY = e.touches[0].clientY;
-            }
-            handleTouchStart(e);
-        }, { passive: false });
-        
-        vrContainer.addEventListener('touchmove', function(e) {
-            if (e.touches.length === 1) {
-                swipeEndX = e.touches[0].clientX;
-                swipeEndY = e.touches[0].clientY;
-            }
-            handleTouchMove(e);
-        }, { passive: false });
-        
-        vrContainer.addEventListener('touchend', function(e) {
-            const deltaX = swipeEndX - swipeStartX;
-            const deltaY = swipeEndY - swipeStartY;
-            
-            // Detect horizontal swipe right with minimal vertical movement
-            if (deltaX > swipeThreshold && Math.abs(deltaY) < 50) {
-                // Trigger back to home page on swipe right
-                backToHomePage();
-            }
-            
-            swipeStartX = 0;
-            swipeStartY = 0;
-            swipeEndX = 0;
-            swipeEndY = 0;
-            
-            handleTouchEnd(e);
-        }, { passive: true });
+        vrContainer.addEventListener('touchstart', handleTouchStart, { passive: false });
+        vrContainer.addEventListener('touchmove', handleTouchMove, { passive: false });
+        vrContainer.addEventListener('touchend', handleTouchEnd, { passive: true });
         
         vrContainer.addEventListener('mousedown', handleMouseStart, { passive: true });
         vrContainer.addEventListener('mousemove', handleMouseMove, { passive: true });
@@ -762,7 +776,7 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => elements.lookDownBtn.style.transform = '', 200);
     }
     
-    // Optimized image item click handling
+    // Optimized image item click handling - load on demand only
     function setupImageItemClicks() {
         elements.imageItems.forEach(item => {
             item.addEventListener('click', function() {
@@ -777,44 +791,45 @@ document.addEventListener('DOMContentLoaded', function() {
                 const mediaName = this.querySelector('.image-caption').textContent;
                 const category = this.getAttribute('data-category');
                 
-                // Preload the image before transitioning
-                ImageLoader.preload(imgSrc).then(() => {
-                    elements.homePage.style.opacity = '0';
+                // Load the clicked image with high priority (no preloading)
+                elements.homePage.style.opacity = '0';
+                
+                setTimeout(() => {
+                    elements.homePage.style.display = 'none';
+                    elements.vrContainer.style.display = 'block';
+                    elements.backToHome.style.display = 'block';
+                    
+                    forceControlPanelVisible();
+                    elements.vrNavControls.style.display = 'flex';
+                    
+                    state.currentCategory = category;
+                    state.isInVRView = true;
+                    const categoryItems = Array.from(document.querySelectorAll(`.image-item[data-category="${category}"]`));
+                    state.currentMediaIndex = categoryItems.indexOf(this);
                     
                     setTimeout(() => {
-                        elements.homePage.style.display = 'none';
-                        elements.vrContainer.style.display = 'block';
-                        elements.backToHome.style.display = 'block';
-                        
-                        forceControlPanelVisible();
-                        elements.vrNavControls.style.display = 'flex';
-                        
-                        state.currentCategory = category;
-                        state.isInVRView = true;
-                        const categoryItems = Array.from(document.querySelectorAll(`.image-item[data-category="${category}"]`));
-                        state.currentMediaIndex = categoryItems.indexOf(this);
-                        
-                        setTimeout(() => {
-                            const scene = document.querySelector('a-scene');
-                            if (scene) {
-                                window.dispatchEvent(new Event('resize'));
-                                
-                                setTimeout(() => {
-                                    loadSkyTexture(imgSrc, mediaName);
-                                    
-                                    setTimeout(() => {
-                                        forceControlPanelVisible();
-                                    }, 300);
-                                }, 200);
-                            } else {
+                        const scene = document.querySelector('a-scene');
+                        if (scene) {
+                            window.dispatchEvent(new Event('resize'));
+                            
+                            setTimeout(() => {
                                 loadSkyTexture(imgSrc, mediaName);
-                            }
-                        }, 100);
-                    }, 400);
-                }).catch(error => {
-                    console.error('Failed to preload image:', error);
-                    showNotification('<i class="fas fa-exclamation-triangle"></i> Failed to load image');
-                });
+                                
+                                // Preload adjacent images after current image loads
+                                setTimeout(() => {
+                                    ImageLoader.preloadAdjacent(state.currentMediaIndex, category);
+                                    forceControlPanelVisible();
+                                }, 300);
+                            }, 200);
+                        } else {
+                            loadSkyTexture(imgSrc, mediaName);
+                            // Preload adjacent images after current image loads
+                            setTimeout(() => {
+                                ImageLoader.preloadAdjacent(state.currentMediaIndex, category);
+                            }, 1000);
+                        }
+                    }, 100);
+                }, 400);
             });
         });
     }
@@ -916,11 +931,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     const imgSrc = prevImage.getAttribute('data-src');
                     const mediaName = prevImage.querySelector('.image-caption').textContent;
                     
-                    // Preload before loading
-                    ImageLoader.preload(imgSrc).then(() => {
-                        loadSkyTexture(imgSrc, mediaName);
-                        updateNavigationButtonStates(categoryItems.length);
-                    });
+                    // Load with priority and preload adjacent after
+                    loadSkyTexture(imgSrc, mediaName);
+                    updateNavigationButtonStates(categoryItems.length);
+                    
+                    // Preload adjacent images after current loads
+                    setTimeout(() => {
+                        ImageLoader.preloadAdjacent(state.currentMediaIndex, state.currentCategory);
+                    }, 1000);
                 } else {
                     this.classList.add('disabled');
                     setTimeout(() => {
@@ -954,11 +972,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     const imgSrc = nextImage.getAttribute('data-src');
                     const mediaName = nextImage.querySelector('.image-caption').textContent;
                     
-                    // Preload before loading
-                    ImageLoader.preload(imgSrc).then(() => {
-                        loadSkyTexture(imgSrc, mediaName);
-                        updateNavigationButtonStates(categoryItems.length);
-                    });
+                    // Load with priority and preload adjacent after
+                    loadSkyTexture(imgSrc, mediaName);
+                    updateNavigationButtonStates(categoryItems.length);
+                    
+                    // Preload adjacent images after current loads
+                    setTimeout(() => {
+                        ImageLoader.preloadAdjacent(state.currentMediaIndex, state.currentCategory);
+                    }, 1000);
                 } else {
                     this.classList.add('disabled');
                     setTimeout(() => {
