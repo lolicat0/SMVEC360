@@ -1,12 +1,5 @@
-// Check if DOM is already loaded
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeVRTour);
-} else {
-    // DOM is already loaded
-    initializeVRTour();
-}
-
-function initializeVRTour() {
+// Wait for DOM to be fully loaded
+document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM loaded, initializing VR Tour...');
     
     // Performance optimization - cache frequently used selectors
@@ -156,21 +149,18 @@ function initializeVRTour() {
     // Setup optimized lazy loading with intersection observer
     function setupLazyLoading() {
         const lazyImages = document.querySelectorAll('.lazy-image');
-
-        // Detect mobile devices (simple check)
-        const isMobile = /Mobi|Android/i.test(navigator.userAgent);
-
-        if ('IntersectionObserver' in window && !isMobile) {
+        
+        if ('IntersectionObserver' in window) {
             const lazyImageObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         const img = entry.target;
                         const pictureElement = img.closest('picture');
-
+                        
                         if (pictureElement) {
                             // Use optimized loading
                             img.setAttribute('data-loaded', 'true');
-
+                            
                             const parent = img.closest('.image-item');
                             if (parent) {
                                 const placeholder = parent.querySelector('.image-placeholder');
@@ -178,7 +168,7 @@ function initializeVRTour() {
                                     placeholder.style.opacity = '0';
                                     setTimeout(() => placeholder.remove(), 300);
                                 }
-
+                                
                                 // Use requestAnimationFrame for smoother animation
                                 requestAnimationFrame(() => {
                                     parent.classList.add('loaded');
@@ -192,12 +182,12 @@ function initializeVRTour() {
                 rootMargin: '100px 0px',
                 threshold: 0.01
             });
-
+            
             lazyImages.forEach(img => {
                 lazyImageObserver.observe(img);
             });
         } else {
-            // Fallback for mobile or no IntersectionObserver support: load all images immediately
+            // Fallback with performance optimization
             lazyImages.forEach(img => {
                 img.setAttribute('data-loaded', 'true');
                 const parent = img.closest('.image-item');
@@ -792,17 +782,9 @@ function initializeVRTour() {
         });
     }
     
-    // Optimized back to home function with cancel support
+    // Optimized back to home function
     function backToHomePage() {
-        // Allow back to home even during transition by cancelling ongoing loading
-        if (state.isTransitioning) {
-            console.log('Cancelling ongoing transition to return home...');
-            // Reset transition state immediately
-            state.isTransitioning = false;
-            // Clear loading queue and promises if any
-            ImageLoader.loadingPromises.clear();
-            ImageLoader.cache.clear();
-        }
+        if (state.isTransitioning) return;
         state.isTransitioning = true;
         
         console.log('Returning to home page...');
@@ -1495,20 +1477,15 @@ function initializeVRTour() {
     console.time('App Initialization');
     initialize();
     console.timeEnd('App Initialization');
-}
-
-window.addEventListener('popstate', function(event) {
-    // If currently in VR view or not on home page, go back to home page
-    const vrContainer = document.getElementById('vr-container');
-    const homePage = document.getElementById('home-page');
-    if (vrContainer && homePage && vrContainer.style.display === 'block') {
-        // Call backToHomePage function to show home page
-        const backToHomeBtn = document.getElementById('back-to-home');
-        if (backToHomeBtn) {
-            backToHomeBtn.click();
-        }
-    }
 });
+
+// Additional safety measure - if DOM is already loaded
+if (document.readyState === 'loading') {
+    console.log('DOM is still loading...');
+} else {
+    console.log('DOM already loaded, running initialization...');
+    window.dispatchEvent(new Event('DOMContentLoaded'));
+}
 
 // Service Worker registration for caching (optional performance boost)
 if ('serviceWorker' in navigator) {
